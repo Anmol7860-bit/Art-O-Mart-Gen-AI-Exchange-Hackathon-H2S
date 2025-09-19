@@ -1,4 +1,4 @@
-# 🎨 Art-O-Mart - Handcrafted Artisan Marketplace
+# 🎨 Art-O-Mart - Marketplace Assistance for Local Artists
 
 **Empowering artisans, connecting communities, celebrating craftsmanship.**
 
