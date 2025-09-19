@@ -1,9 +1,16 @@
-Logo Assets Placeholder
-=======================
+# Logo Assets Placeholder
 
 Please add the following files to this directory:
 
-1. artomart.jpg - Round logo for the application
-2. artomart.png - App name with curved edges
+1. **artomart.jpg**  
+   - Round logo for the application  
+   - Used as favicon, app icon, and PWA logo  
 
-For now, we'll use a CSS-based logo design in the registration component.
+2. **artomart.png**  
+   - App name with curved edges  
+   - Used as the brand wordmark  
+
+---
+
+📌 Note:  
+Until these files are added, the app will use a **CSS-based logo design** inside the `Registration` component as a temporary placeholder.
