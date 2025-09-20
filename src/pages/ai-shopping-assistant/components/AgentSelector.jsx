@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Select } from '../../../components/ui/Select';
+import Select from '../../../components/ui/Select';
 import AgentStatusIndicator from './AgentStatusIndicator';
 
 const AGENT_TYPES = {

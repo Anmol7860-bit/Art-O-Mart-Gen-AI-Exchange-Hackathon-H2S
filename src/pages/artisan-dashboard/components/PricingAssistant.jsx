@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import Button from '../../../components/ui/Button';
 import AppIcon from '../../../components/AppIcon';
-import { AgentStatusIndicator } from '../../ai-shopping-assistant/components/AgentStatusIndicator';
-import { TaskProgress } from '../../ai-shopping-assistant/components/TaskProgress';
+import AgentStatusIndicator from '../../ai-shopping-assistant/components/AgentStatusIndicator';
+import TaskProgress from '../../ai-shopping-assistant/components/TaskProgress';
 import { useWebSocket } from '../../ai-shopping-assistant/components/WebSocketManager';
 
 const COMPLEXITY_LEVELS = [

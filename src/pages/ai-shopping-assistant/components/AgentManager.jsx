@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useWebSocket } from './WebSocketManager';
 import { useAuth } from '../../../contexts/AuthContext';
-import { AgentStatusIndicator } from './AgentStatusIndicator';
-import { Button } from '../../../components/ui/Button';
+import AgentStatusIndicator from './AgentStatusIndicator';
+import Button from '../../../components/ui/Button';
 
 const AGENT_TYPES = {
   productRecommendation: {

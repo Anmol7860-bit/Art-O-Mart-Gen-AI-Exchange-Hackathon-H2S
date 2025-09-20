@@ -7,6 +7,9 @@ const WebSocketContext = createContext(null);
 const RETRY_INTERVALS = [1000, 2000, 5000, 10000]; // Retry delays in ms
 const MAX_RETRIES = RETRY_INTERVALS.length;
 
+// Development mode flag - set to true to run without backend
+const DEVELOPMENT_MODE = true;
+
 export const WebSocketProvider = ({ children }) => {
   const { session } = useAuth();
   const [socket, setSocket] = useState(null);
@@ -15,6 +18,14 @@ export const WebSocketProvider = ({ children }) => {
   const [subscribers, setSubscribers] = useState(new Map());
 
   useEffect(() => {
+    // In development mode, simulate connection without actual WebSocket
+    if (DEVELOPMENT_MODE) {
+      console.log('Running in development mode - WebSocket connection simulated');
+      setIsConnected(true);
+      setRetryCount(0);
+      return;
+    }
+
     if (!session?.access_token) return;
 
     const socketInstance = io(process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000', {
@@ -84,6 +95,20 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const emit = (event, data) => {
+    if (DEVELOPMENT_MODE) {
+      console.log(`[DEV MODE] Emitting event: ${event}`, data);
+      // Simulate a mock response for development
+      setTimeout(() => {
+        const eventSubscribers = subscribers.get('ai-response') || [];
+        eventSubscribers.forEach(callback => callback({
+          message: `Mock response for ${event}`,
+          data: data,
+          timestamp: new Date().toISOString()
+        }));
+      }, 1000);
+      return true;
+    }
+
     if (!socket?.connected) {
       console.error('Cannot emit event: socket not connected');
       return false;
@@ -93,12 +118,20 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   const joinAgentRoom = (agentType) => {
+    if (DEVELOPMENT_MODE) {
+      console.log(`[DEV MODE] Joining agent room: ${agentType}`);
+      return true;
+    }
     if (!socket?.connected) return false;
     socket.emit('subscribe-agent', agentType);
     return true;
   };
 
   const leaveAgentRoom = (agentType) => {
+    if (DEVELOPMENT_MODE) {
+      console.log(`[DEV MODE] Leaving agent room: ${agentType}`);
+      return true;
+    }
     if (!socket?.connected) return false;
     socket.emit('unsubscribe-agent', agentType);
     return true;

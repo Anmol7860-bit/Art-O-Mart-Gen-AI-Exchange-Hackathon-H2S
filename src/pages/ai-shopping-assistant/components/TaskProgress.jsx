@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AppIcon } from '../../../components/AppIcon';
+import AppIcon from '../../../components/AppIcon';
 
 const TaskProgress = ({
   taskId,

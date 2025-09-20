@@ -2,39 +2,17 @@
   "name": "art-o-mart",
   "version": "0.1.0",
   "private": true,
-  "rocketCritical": {
-    "dependencies": [
-      "@dhiwise/component-tagger",
-      "react",
-      "react-dom",
-      "@reduxjs/toolkit",
-      "redux",
-      "react-router-dom"
-    ],
-    "devDependencies": [
-      "@vitejs/plugin-react",
-      "vite",
-      "vite-tsconfig-paths",
-      "tailwindcss",
-      "autoprefixer",
-      "postcss"
-    ],
-    "scripts": [
-      "start",
-      "build",
-      "serve"
-    ],
-    "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for app functionality"
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build --sourcemap",
+    "preview": "vite preview",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "@dhiwise/component-tagger": "^1.0.10",
     "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^2.6.1",
     "@supabase/supabase-js": "^2.57.4",
-    "@tailwindcss/forms": "^0.5.7",
-    "@testing-library/jest-dom": "^5.15.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -51,15 +29,8 @@
     "react-router-hash-link": "^2.4.3",
     "recharts": "^2.15.2",
     "redux": "^5.0.1",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
-    "tailwindcss-elevation": "^2.0.0",
-    "tailwindcss-fluid-type": "^2.0.7"
-  },
-  "scripts": {
-    "start": "vite",
-    "build": "vite build --sourcemap",
-    "serve": "vite preview"
+    "socket.io-client": "^4.8.1",
+    "tailwind-merge": "^3.3.1"
   },
   "eslintConfig": {
     "extends": [
@@ -80,14 +51,22 @@
     ]
   },
   "devDependencies": {
+    "@dhiwise/component-tagger": "^1.0.10",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/line-clamp": "^0.1.0",
     "@tailwindcss/typography": "^0.5.16",
+    "@testing-library/jest-dom": "^5.15.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
     "@vitejs/plugin-react": "4.3.4",
     "autoprefixer": "10.4.2",
     "postcss": "8.4.8",
     "tailwindcss": "3.4.6",
+    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-elevation": "^2.0.0",
+    "tailwindcss-fluid-type": "^2.0.7",
     "vite": "5.0.0",
     "vite-tsconfig-paths": "3.6.0"
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import AppIcon from '../../../components/AppIcon';
 import AppImage from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
-import { TaskProgress } from './TaskProgress';
+import TaskProgress from './TaskProgress';
 import AgentStatusIndicator from './AgentStatusIndicator';
 
 const AGENT_ICONS = {

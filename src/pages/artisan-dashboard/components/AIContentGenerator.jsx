@@ -3,8 +3,8 @@ import AppIcon from '../../../components/AppIcon';
 import AppImage from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
-import { AgentStatusIndicator } from '../../ai-shopping-assistant/components/AgentStatusIndicator';
-import { TaskProgress } from '../../ai-shopping-assistant/components/TaskProgress';
+import AgentStatusIndicator from '../../ai-shopping-assistant/components/AgentStatusIndicator';
+import TaskProgress from '../../ai-shopping-assistant/components/TaskProgress';
 import { useWebSocket } from '../../ai-shopping-assistant/components/WebSocketManager';
 
 const contentTypes = [
