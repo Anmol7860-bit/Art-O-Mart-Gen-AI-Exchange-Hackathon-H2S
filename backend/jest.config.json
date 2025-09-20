@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "testEnvironment": "node",
+  "testMatch": [
+    "**/tests/**/*.test.js"
+  ],
+  "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+  "collectCoverageFrom": [
+    "**/*.{js,jsx}",
+    "!**/node_modules/**",
+    "!**/tests/**",
+    "!**/coverage/**"
+  ],
+  "coverageReporters": ["text", "lcov", "html"],
+  "coverageDirectory": "coverage",
+  "verbose": true,
+  "testTimeout": 30000,
+  "globalSetup": "<rootDir>/tests/globalSetup.js",
+  "globalTeardown": "<rootDir>/tests/globalTeardown.js"
+}

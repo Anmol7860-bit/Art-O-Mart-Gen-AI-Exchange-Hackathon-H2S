@@ -1,0 +1,172 @@
+# Supabase CLI Configuration for Art-O-Mart
+# This file configures the Supabase CLI for local development and migration management
+
+# Project Configuration
+# Replace 'your-project-ref' with your actual Supabase project reference
+# Get this from your Supabase Dashboard > Settings > General > Reference ID
+project_id = "your-project-ref"
+
+[api]
+# API server configuration
+enabled = true
+# Port for local Supabase API server
+port = 54321
+# Schemas exposed via the API
+schemas = ["public", "graphql_public", "storage"]
+# Extra search paths for API
+extra_search_path = ["public", "extensions"]
+# Maximum number of rows returned by a single API call
+max_rows = 1000
+
+[db]
+# Database configuration
+# Port for local database (PostgreSQL)
+port = 54322
+# Major version of PostgreSQL to use
+major_version = 15
+
+[studio]
+# Supabase Studio (Admin UI) configuration
+enabled = true
+# Port for local Studio interface
+port = 54323
+
+[inbucket]
+# Email testing service configuration
+enabled = true
+port = 54324
+
+[storage]
+# Storage API configuration
+enabled = true
+port = 54325
+image_transformation = {
+  enabled = true
+}
+# File size limits (in bytes)
+file_size_limit = "50MiB"
+# Allowed MIME types for uploads
+allowed_mime_types = [
+  "image/jpeg", 
+  "image/png", 
+  "image/gif", 
+  "image/webp",
+  "image/svg+xml"
+]
+
+[auth]
+# Authentication configuration
+enabled = true
+# Additional redirect URLs for OAuth
+additional_redirect_urls = [
+  "http://localhost:3000", 
+  "http://localhost:4028",
+  "https://your-app-domain.com"
+]
+# JWT expiry time
+jwt_expiry = 3600
+# Whether to enable email confirmations
+enable_signup = true
+# Whether to enable anonymous sign-ins  
+enable_anonymous_sign_ins = false
+
+# External OAuth providers (configure as needed)
+[auth.external.apple]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.azure]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.bitbucket]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.discord]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.facebook]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.github]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.gitlab]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.keycloak]
+enabled = false
+server_url = ""
+client_id = ""
+secret = ""
+
+[auth.external.linkedin]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.notion]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.twitch]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.twitter]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.slack]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.spotify]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.workos]
+enabled = false
+client_id = ""
+secret = ""
+
+[auth.external.zoom]
+enabled = false
+client_id = ""
+secret = ""
+
+# Configuration for different environments
+# To use with remote project:
+# 1. Set project_id to your actual Supabase project reference
+# 2. Run: supabase link --project-ref your-project-ref
+# 3. Apply migrations: supabase db push
+
+# For local development:
+# 1. Run: supabase start (starts local Supabase stack)
+# 2. Run: supabase db reset (applies migrations to local DB)
+# 3. Access local services:
+#    - API: http://localhost:54321
+#    - Studio: http://localhost:54323
+#    - Database: postgresql://postgres:postgres@localhost:54322/postgres

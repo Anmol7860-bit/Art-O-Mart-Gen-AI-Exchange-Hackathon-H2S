@@ -3,6 +3,9 @@
 -- Integration Type: Complete e-commerce marketplace with auth
 -- Dependencies: None (first migration)
 
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- 1. Types and Enums
 CREATE TYPE public.user_role AS ENUM ('customer', 'artisan', 'admin');
 CREATE TYPE public.product_status AS ENUM ('draft', 'active', 'inactive', 'sold_out');
@@ -55,7 +58,7 @@ CREATE TABLE public.artisan_profiles (
 CREATE TABLE public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     artisan_id UUID NOT NULL REFERENCES public.artisan_profiles(id) ON DELETE CASCADE,
-    category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE SET NULL,
+    category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE RESTRICT,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     price DECIMAL(10,2) NOT NULL CHECK (price > 0),
@@ -174,7 +177,8 @@ INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 VALUES 
     ('product-images', 'product-images', true, 10485760, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg']),
     ('profile-images', 'profile-images', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg']),
-    ('category-images', 'category-images', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg']);
+    ('category-images', 'category-images', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg'])
+ON CONFLICT (id) DO NOTHING;
 
 -- 6. Functions (BEFORE RLS policies)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -218,6 +222,17 @@ DECLARE
 BEGIN
     order_num := 'AOM-' || TO_CHAR(CURRENT_TIMESTAMP, 'YYYYMMDD') || '-' || LPAD(floor(random() * 10000)::TEXT, 4, '0');
     RETURN order_num;
+END;
+$$;
+
+-- Generic updated_at function
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
 END;
 $$;
 
@@ -423,6 +438,23 @@ CREATE TRIGGER on_product_review_change
     AFTER INSERT OR UPDATE OR DELETE ON public.product_reviews
     FOR EACH ROW EXECUTE FUNCTION public.update_product_stats();
 
+-- Add updated_at triggers for tables with updated_at columns
+CREATE TRIGGER set_updated_at_user_profiles
+    BEFORE UPDATE ON public.user_profiles
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_updated_at_artisan_profiles
+    BEFORE UPDATE ON public.artisan_profiles
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_updated_at_products
+    BEFORE UPDATE ON public.products
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_updated_at_orders
+    BEFORE UPDATE ON public.orders
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
 -- 10. Mock Data with complete auth.users
 DO $$
 DECLARE
@@ -491,7 +523,8 @@ BEGIN
         (category3_uuid, 'Pottery', 'pottery', 'Hand-thrown ceramics, vases and decorative pottery',
          'https://images.pixabay.com/photo/2017/08/01/11/48/blue-2564660_1280.jpg?w=300&h=300&fit=crop', true),
         (category4_uuid, 'Jewelry', 'jewelry', 'Traditional and contemporary handmade jewelry',
-         'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop', true);
+         'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop', true)
+    ON CONFLICT (id) DO NOTHING;
 
     -- Artisan Profiles
     INSERT INTO public.artisan_profiles (
@@ -503,7 +536,8 @@ BEGIN
          15, 'Rajasthan', 4.8, true, now()),
         (artisan_profile2_uuid, artisan2_uuid, 'Gujarat Wood Artistry', 'Wood Carving and Sculpture',
          'Skilled woodworker creating intricate sculptures and decorative items using traditional Gujarati carving techniques passed down through generations.',
-         12, 'Gujarat', 4.9, true, now());
+         12, 'Gujarat', 4.9, true, now())
+    ON CONFLICT (id) DO NOTHING;
 
     -- Products
     INSERT INTO public.products (
@@ -541,7 +575,8 @@ BEGIN
          ARRAY['https://images.pixabay.com/photo/2017/08/01/11/48/blue-2564660_1280.jpg?w=400&h=400&fit=crop',
                'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop'],
          ARRAY['silver', 'filigree', 'traditional', 'bengali'], true,
-         ARRAY['Sterling Silver', 'Handcrafted']);
+         ARRAY['Sterling Silver', 'Handcrafted'])
+    ON CONFLICT (id) DO NOTHING;
 
     -- Product Reviews
     INSERT INTO public.product_reviews (product_id, reviewer_id, rating, review_text, is_verified_purchase) VALUES
@@ -549,7 +584,8 @@ BEGIN
         (product1_uuid, customer2_uuid, 4, 'Beautiful traditional work. Shipping was fast and packaging was excellent.', true),
         (product2_uuid, customer1_uuid, 5, 'This sculpture is a masterpiece! The detail work is incredible.', true),
         (product3_uuid, customer2_uuid, 4, 'Lovely vase with beautiful paintings. Perfect for my living room.', false),
-        (product4_uuid, customer1_uuid, 5, 'Elegant earrings with intricate filigree work. Great quality!', true);
+        (product4_uuid, customer1_uuid, 5, 'Elegant earrings with intricate filigree work. Great quality!', true)
+    ON CONFLICT (id) DO NOTHING;
 
 EXCEPTION
     WHEN foreign_key_violation THEN
@@ -559,3 +595,97 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE NOTICE 'Unexpected error during mock data insertion: %', SQLERRM;
 END $$;
+
+-- 9. Health Check Function (for backend health route)
+-- Creates a simple RPC function that returns database status and version information
+-- Can be called by authenticated users to check database connectivity
+CREATE OR REPLACE FUNCTION public.health_check()
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_build_object(
+    'status', 'healthy',
+    'timestamp', CURRENT_TIMESTAMP,
+    'version', version(),
+    'database', current_database(),
+    'user', current_user,
+    'tables_count', (
+      SELECT COUNT(*)
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+    ),
+    'connection_info', json_build_object(
+      'server_version', current_setting('server_version'),
+      'client_encoding', current_setting('client_encoding'),
+      'timezone', current_setting('timezone')
+    )
+  );
+$$;
+
+-- Helper functions for test schema access
+CREATE OR REPLACE FUNCTION public.get_public_tables()
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_agg(table_name)
+  FROM information_schema.tables
+  WHERE table_schema = 'public'
+  AND table_type = 'BASE TABLE';
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_table_columns(table_name_param TEXT)
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_agg(json_build_object(
+    'column_name', column_name,
+    'data_type', data_type,
+    'is_nullable', is_nullable
+  ))
+  FROM information_schema.columns
+  WHERE table_schema = 'public'
+  AND table_name = table_name_param;
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_foreign_keys()
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_agg(json_build_object(
+    'constraint_name', constraint_name,
+    'table_name', table_name,
+    'constraint_type', constraint_type
+  ))
+  FROM information_schema.table_constraints
+  WHERE constraint_type = 'FOREIGN KEY'
+  AND table_schema = 'public';
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_enum_types()
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_agg(typname)
+  FROM pg_type
+  WHERE typtype = 'e'
+  AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public');
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_table_indexes(table_name_param TEXT)
+RETURNS JSON
+LANGUAGE SQL
+SECURITY DEFINER
+AS $$
+  SELECT json_agg(json_build_object(
+    'indexname', indexname,
+    'tablename', tablename
+  ))
+  FROM pg_indexes
+  WHERE schemaname = 'public'
+  AND tablename = table_name_param;
+$$;
