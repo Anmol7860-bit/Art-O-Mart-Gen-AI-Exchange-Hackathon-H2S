@@ -8,6 +8,7 @@ import { supabaseAdmin } from './config/database.js';
 import agentManager from './api/agentManager.js';
 import WebSocketManager from './api/websocket.js';
 import { initializeEnvironment } from './utils/envValidator.js';
+import backendMonitoring from './middleware/monitoring.js';
 
 // Import enhanced middleware
 import { getCorsMiddleware } from './middleware/cors.js';
@@ -44,10 +45,14 @@ const wsManager = new WebSocketManager(httpServer, agentManager);
 // Trust proxy (important for accurate client IP detection)
 app.set('trust proxy', 1);
 
+// Initialize monitoring
+backendMonitoring.init({ app });
+
 // Core middleware
 app.use(compression()); // Enable gzip compression
 app.use(helmet()); // Security headers
 app.use(requestIdMiddleware); // Add unique request ID
+app.use(backendMonitoring.requestMiddleware()); // Monitoring middleware
 app.use(getCorsMiddleware('enhanced')); // Advanced CORS with security headers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -80,6 +85,9 @@ const limiter = rateLimit({
 });
 
 app.use('/api/', limiter);
+
+// Metrics endpoint
+app.get('/metrics', backendMonitoring.metricsEndpoint());
 
 // Health check route (no auth required)
 app.use('/api/health', healthRouter);

@@ -1,0 +1,58 @@
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: artomart-network
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@artomart.com
+      storage: /acme.json
+      httpChallenge:
+        entryPoint: web
+
+# Global middlewares
+http:
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "admin:$2y$10$2b2cu8Fw.rDKgp2ZgKHT7OeOh9d5rFCnK4gF1vgF7ynR8E9a.Bz.O"
+    
+    secure-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+        customResponseHeaders:
+          X-Frame-Options: DENY
+          X-Content-Type-Options: nosniff
+          X-XSS-Protection: "1; mode=block"
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 200
+        period: 1m
+
+# Metrics
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true

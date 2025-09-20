@@ -1,0 +1,481 @@
+{
+  "cloudfront": {
+    "description": "AWS CloudFront CDN Configuration",
+    "distributions": [
+      {
+        "id": "art-o-mart-frontend",
+        "domain": "cdn.artomart.com",
+        "origins": [
+          {
+            "id": "frontend-origin",
+            "domainName": "artomart.vercel.app",
+            "customOriginConfig": {
+              "httpPort": 443,
+              "httpsPort": 443,
+              "originProtocolPolicy": "https-only",
+              "originSslProtocols": ["TLSv1.2"]
+            }
+          }
+        ],
+        "defaultCacheBehavior": {
+          "targetOriginId": "frontend-origin",
+          "viewerProtocolPolicy": "redirect-to-https",
+          "compress": true,
+          "cachePolicyId": "custom-spa-policy",
+          "ttl": {
+            "default": 86400,
+            "max": 31536000,
+            "min": 0
+          },
+          "allowedMethods": ["GET", "HEAD", "OPTIONS"],
+          "cachedMethods": ["GET", "HEAD", "OPTIONS"]
+        },
+        "cacheBehaviors": [
+          {
+            "pathPattern": "/static/*",
+            "targetOriginId": "frontend-origin",
+            "viewerProtocolPolicy": "redirect-to-https",
+            "compress": true,
+            "cachePolicyId": "static-assets-policy",
+            "ttl": {
+              "default": 31536000,
+              "max": 31536000,
+              "min": 86400
+            },
+            "headers": ["Access-Control-Request-Headers", "Access-Control-Request-Method", "Origin"]
+          },
+          {
+            "pathPattern": "/api/*",
+            "targetOriginId": "frontend-origin",
+            "viewerProtocolPolicy": "redirect-to-https",
+            "compress": true,
+            "cachePolicyId": "api-policy",
+            "ttl": {
+              "default": 0,
+              "max": 300,
+              "min": 0
+            },
+            "forwardedValues": {
+              "queryString": true,
+              "headers": ["Authorization", "Content-Type", "Accept"]
+            }
+          },
+          {
+            "pathPattern": "/images/*",
+            "targetOriginId": "frontend-origin",
+            "viewerProtocolPolicy": "redirect-to-https",
+            "compress": true,
+            "cachePolicyId": "image-optimization-policy",
+            "ttl": {
+              "default": 2592000,
+              "max": 31536000,
+              "min": 86400
+            }
+          }
+        ],
+        "customErrorResponses": [
+          {
+            "errorCode": 404,
+            "responseCode": 200,
+            "responsePage": "/index.html",
+            "errorCachingMinTtl": 300
+          },
+          {
+            "errorCode": 403,
+            "responseCode": 200,
+            "responsePage": "/index.html",
+            "errorCachingMinTtl": 300
+          }
+        ],
+        "geoRestriction": {
+          "restrictionType": "whitelist",
+          "locations": ["IN", "US", "GB", "CA", "AU"]
+        },
+        "priceClass": "PriceClass_100",
+        "httpVersion": "http2",
+        "ipv6Enabled": true
+      }
+    ],
+    "cachePolicies": [
+      {
+        "id": "custom-spa-policy",
+        "name": "ArtOMart-SPA-Policy",
+        "defaultTtl": 86400,
+        "maxTtl": 31536000,
+        "minTtl": 0,
+        "parametersInCacheKeyAndForwardedToOrigin": {
+          "enableAcceptEncodingGzip": true,
+          "enableAcceptEncodingBrotli": true,
+          "queryStringsConfig": {
+            "queryStringBehavior": "none"
+          },
+          "headersConfig": {
+            "headerBehavior": "whitelist",
+            "headers": ["CloudFront-Viewer-Country", "Accept-Language"]
+          }
+        }
+      },
+      {
+        "id": "static-assets-policy",
+        "name": "ArtOMart-Static-Assets",
+        "defaultTtl": 31536000,
+        "maxTtl": 31536000,
+        "minTtl": 86400,
+        "parametersInCacheKeyAndForwardedToOrigin": {
+          "enableAcceptEncodingGzip": true,
+          "enableAcceptEncodingBrotli": true,
+          "queryStringsConfig": {
+            "queryStringBehavior": "whitelist",
+            "queryStrings": ["v", "version"]
+          },
+          "headersConfig": {
+            "headerBehavior": "whitelist",
+            "headers": ["Accept", "Accept-Encoding"]
+          }
+        }
+      },
+      {
+        "id": "api-policy",
+        "name": "ArtOMart-API-Policy",
+        "defaultTtl": 0,
+        "maxTtl": 300,
+        "minTtl": 0,
+        "parametersInCacheKeyAndForwardedToOrigin": {
+          "enableAcceptEncodingGzip": true,
+          "enableAcceptEncodingBrotli": true,
+          "queryStringsConfig": {
+            "queryStringBehavior": "all"
+          },
+          "headersConfig": {
+            "headerBehavior": "whitelist",
+            "headers": [
+              "Authorization",
+              "Content-Type",
+              "Accept",
+              "Origin",
+              "Referer",
+              "User-Agent"
+            ]
+          }
+        }
+      },
+      {
+        "id": "image-optimization-policy",
+        "name": "ArtOMart-Image-Optimization",
+        "defaultTtl": 2592000,
+        "maxTtl": 31536000,
+        "minTtl": 86400,
+        "parametersInCacheKeyAndForwardedToOrigin": {
+          "enableAcceptEncodingGzip": true,
+          "enableAcceptEncodingBrotli": true,
+          "queryStringsConfig": {
+            "queryStringBehavior": "whitelist",
+            "queryStrings": ["w", "h", "q", "format", "fit"]
+          },
+          "headersConfig": {
+            "headerBehavior": "whitelist",
+            "headers": ["Accept", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-Tablet-Viewer"]
+          }
+        }
+      }
+    ]
+  },
+  "cloudflare": {
+    "description": "Cloudflare CDN Configuration",
+    "zones": [
+      {
+        "name": "artomart.com",
+        "settings": {
+          "ssl": "flexible",
+          "security_level": "medium",
+          "cache_level": "aggressive",
+          "browser_cache_ttl": 31536000,
+          "edge_cache_ttl": 7200,
+          "always_online": "on",
+          "development_mode": "off",
+          "ipv6": "on",
+          "websockets": "on",
+          "pseudo_ipv4": "off",
+          "ip_geolocation": "on",
+          "email_obfuscation": "on",
+          "server_side_exclude": "on",
+          "hotlink_protection": "off",
+          "minify": {
+            "css": "on",
+            "html": "on",
+            "js": "on"
+          },
+          "brotli": "on",
+          "http2": "on",
+          "http3": "on",
+          "zero_rtt": "on",
+          "tls_1_3": "on"
+        },
+        "pageRules": [
+          {
+            "targets": [
+              {
+                "target": "url",
+                "constraint": {
+                  "operator": "matches",
+                  "value": "*.artomart.com/static/*"
+                }
+              }
+            ],
+            "actions": [
+              {
+                "id": "browser_cache_ttl",
+                "value": 31536000
+              },
+              {
+                "id": "edge_cache_ttl",
+                "value": 31536000
+              },
+              {
+                "id": "cache_level",
+                "value": "cache_everything"
+              }
+            ],
+            "priority": 1,
+            "status": "active"
+          },
+          {
+            "targets": [
+              {
+                "target": "url",
+                "constraint": {
+                  "operator": "matches",
+                  "value": "*.artomart.com/api/*"
+                }
+              }
+            ],
+            "actions": [
+              {
+                "id": "browser_cache_ttl",
+                "value": 0
+              },
+              {
+                "id": "edge_cache_ttl",
+                "value": 300
+              },
+              {
+                "id": "cache_level",
+                "value": "bypass"
+              }
+            ],
+            "priority": 2,
+            "status": "active"
+          },
+          {
+            "targets": [
+              {
+                "target": "url",
+                "constraint": {
+                  "operator": "matches",
+                  "value": "*.artomart.com/images/*"
+                }
+              }
+            ],
+            "actions": [
+              {
+                "id": "browser_cache_ttl",
+                "value": 2592000
+              },
+              {
+                "id": "edge_cache_ttl",
+                "value": 2592000
+              },
+              {
+                "id": "cache_level",
+                "value": "cache_everything"
+              },
+              {
+                "id": "polish",
+                "value": "lossy"
+              }
+            ],
+            "priority": 3,
+            "status": "active"
+          }
+        ],
+        "firewallRules": [
+          {
+            "filter": {
+              "expression": "(http.user_agent contains \"bot\" and not http.user_agent contains \"googlebot\") or (http.user_agent contains \"crawler\")"
+            },
+            "action": "challenge",
+            "priority": 1000,
+            "description": "Challenge suspicious bots"
+          },
+          {
+            "filter": {
+              "expression": "http.request.uri.path contains \"/admin\" and not ip.src in {123.456.789.0/24}"
+            },
+            "action": "block",
+            "priority": 2000,
+            "description": "Block admin access from untrusted IPs"
+          }
+        ]
+      }
+    ]
+  },
+  "optimization": {
+    "compression": {
+      "gzip": {
+        "enabled": true,
+        "level": 6,
+        "types": [
+          "text/html",
+          "text/css",
+          "text/javascript",
+          "text/plain",
+          "application/json",
+          "application/javascript",
+          "application/xml",
+          "application/rss+xml",
+          "application/atom+xml",
+          "image/svg+xml"
+        ]
+      },
+      "brotli": {
+        "enabled": true,
+        "level": 6,
+        "types": [
+          "text/html",
+          "text/css",
+          "text/javascript",
+          "text/plain",
+          "application/json",
+          "application/javascript",
+          "application/xml",
+          "application/rss+xml",
+          "application/atom+xml",
+          "image/svg+xml"
+        ]
+      }
+    },
+    "imageOptimization": {
+      "webp": {
+        "enabled": true,
+        "quality": 85,
+        "effort": 4
+      },
+      "avif": {
+        "enabled": true,
+        "quality": 80,
+        "effort": 4
+      },
+      "progressive": {
+        "jpeg": true,
+        "png": false
+      },
+      "responsive": {
+        "breakpoints": [640, 768, 1024, 1280, 1536],
+        "formats": ["webp", "avif", "jpeg"],
+        "quality": {
+          "webp": 85,
+          "avif": 80,
+          "jpeg": 85
+        }
+      }
+    },
+    "minification": {
+      "html": {
+        "enabled": true,
+        "removeComments": true,
+        "removeRedundantAttributes": true,
+        "removeScriptTypeAttributes": true,
+        "removeStyleLinkTypeAttributes": true,
+        "useShortDoctype": true
+      },
+      "css": {
+        "enabled": true,
+        "level": 2
+      },
+      "js": {
+        "enabled": true,
+        "mangle": true,
+        "compress": true
+      }
+    }
+  },
+  "security": {
+    "headers": {
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' https:; connect-src 'self' https://api.artomart.com wss://api.artomart.com; frame-src 'none'; object-src 'none';",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+      "X-Frame-Options": "DENY",
+      "X-Content-Type-Options": "nosniff",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
+    },
+    "rateLimiting": {
+      "api": {
+        "requests": 100,
+        "period": 900,
+        "burst": 20
+      },
+      "static": {
+        "requests": 1000,
+        "period": 60,
+        "burst": 100
+      }
+    },
+    "ddosProtection": {
+      "enabled": true,
+      "sensitivity": "medium",
+      "threshold": {
+        "requestsPerSecond": 100,
+        "concurrentConnections": 500
+      }
+    }
+  },
+  "monitoring": {
+    "realUserMonitoring": {
+      "enabled": true,
+      "sampleRate": 0.1
+    },
+    "syntheticMonitoring": {
+      "enabled": true,
+      "locations": ["us-east-1", "eu-west-1", "ap-south-1"],
+      "frequency": 300
+    },
+    "alerting": {
+      "errorRate": {
+        "threshold": 5,
+        "period": 300
+      },
+      "responseTime": {
+        "threshold": 2000,
+        "period": 300
+      },
+      "availability": {
+        "threshold": 99,
+        "period": 900
+      }
+    }
+  },
+  "performance": {
+    "http2ServerPush": {
+      "enabled": true,
+      "resources": [
+        "/static/css/main.css",
+        "/static/js/main.js"
+      ]
+    },
+    "preload": {
+      "fonts": [
+        "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
+      ],
+      "scripts": [
+        "/static/js/vendor.js"
+      ]
+    },
+    "prefetch": {
+      "enabled": true,
+      "resources": [
+        "/api/products/featured",
+        "/api/categories"
+      ]
+    }
+  }
+}

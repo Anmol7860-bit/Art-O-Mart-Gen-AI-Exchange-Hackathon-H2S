@@ -237,17 +237,40 @@ npm run test       # Run tests (if configured)
 npm run build
 ```
 
+### **Recommended Deployment Architecture**
+
+Art-O-Mart uses a modern serverless-first approach for production deployment:
+
+#### **Frontend Deployment**
+- **Primary**: Vercel (recommended) - Optimized for React/Vite applications
+- **Alternative**: Netlify - Excellent static site hosting with edge functions
+- **Features**: Automatic SSL, global CDN, branch previews, and serverless functions
+
+#### **Backend & Security**
+- **API Layer**: Nginx + Express.js with security headers (Helmet middleware)
+- **Reverse Proxy**: Traefik for load balancing and SSL termination
+- **Security Headers**: CSP, HSTS, X-Frame-Options via Nginx configuration
+- **Rate Limiting**: Express rate limiting with Redis backing store
+
+#### **Infrastructure**
+- **Database**: Supabase PostgreSQL (managed)
+- **Authentication**: Supabase Auth (built-in security)
+- **File Storage**: Supabase Storage or AWS S3
+- **Caching**: Redis for sessions and API caching
+- **Monitoring**: Prometheus + Grafana stack
+
 ### **Deployment Options**
-- **Vercel**: Recommended for React applications
-- **Netlify**: Great for static site hosting
-- **Supabase**: Can host the frontend directly
-- **Custom Server**: Deploy to any Node.js hosting
+- **Vercel** (Frontend): `vercel.json` configured for optimized deployment
+- **Netlify** (Frontend): `netlify.toml` with redirect rules and headers
+- **Docker Compose** (Full Stack): `docker-compose.prod.yml` for containerized deployment
+- **Custom VPS**: Manual deployment with Nginx, PM2, and PostgreSQL
 
 ### **Environment Variables for Production**
 ```env
 VITE_SUPABASE_URL=your_production_supabase_url
 VITE_SUPABASE_ANON_KEY=your_production_supabase_anon_key
 VITE_APP_URL=https://your-domain.com
+VITE_SENTRY_DSN=your_sentry_dsn_for_error_tracking
 ```
 
 ## 🧪 Testing

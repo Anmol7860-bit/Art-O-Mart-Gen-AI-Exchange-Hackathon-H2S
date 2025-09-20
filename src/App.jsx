@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Routes from "./Routes";
 import { AuthProvider } from "./contexts/AuthContext";
 import { validateEnvironment, formatSetupInstructions, shouldUseMockData, isDevelopment } from "./utils/envValidator";
+import { initMonitoring } from "./utils/monitoring";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Environment configuration error component
 function EnvironmentConfigError({ validationResult }) {
@@ -77,6 +79,25 @@ function EnvironmentLoader() {
 function App() {
   const [environmentStatus, setEnvironmentStatus] = useState('loading');
   const [validationResult, setValidationResult] = useState(null);
+  const [hasConsent, setHasConsent] = useState(() => {
+    // Check for stored consent
+    return localStorage.getItem('monitoring-consent') === 'granted';
+  });
+
+  useEffect(() => {
+    // Initialize monitoring if consent is granted
+    if (hasConsent) {
+      try {
+        initMonitoring({
+          userId: null, // Will be set after authentication
+          environment: import.meta.env.MODE
+        });
+        console.log('✅ Monitoring initialized');
+      } catch (error) {
+        console.error('❌ Failed to initialize monitoring:', error);
+      }
+    }
+  }, [hasConsent]);
 
   useEffect(() => {
     // Validate environment on app startup
@@ -106,6 +127,24 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Request consent on first visit
+  useEffect(() => {
+    if (!hasConsent && !localStorage.getItem('monitoring-consent-requested')) {
+      const shouldRequestConsent = window.confirm(
+        'Art-O-Mart would like to collect anonymous usage data to improve your experience. This includes error tracking and performance monitoring. No personal data is collected without your consent. Allow monitoring?'
+      );
+      
+      if (shouldRequestConsent) {
+        localStorage.setItem('monitoring-consent', 'granted');
+        setHasConsent(true);
+      } else {
+        localStorage.setItem('monitoring-consent', 'denied');
+      }
+      
+      localStorage.setItem('monitoring-consent-requested', 'true');
+    }
+  }, [hasConsent]);
+
   // Show loading state during validation
   if (environmentStatus === 'loading') {
     return <EnvironmentLoader />;
@@ -118,9 +157,11 @@ function App() {
 
   // Render main application
   return (
-    <AuthProvider>
-      <Routes />
-    </AuthProvider>
+    <ErrorBoundary name="AppRoot">
+      <AuthProvider>
+        <Routes />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -1,0 +1,5 @@
+{
+  "domains": [],
+  "email": "admin@artomart.com",
+  "caServer": "https://acme-v02.api.letsencrypt.org/directory"
+}

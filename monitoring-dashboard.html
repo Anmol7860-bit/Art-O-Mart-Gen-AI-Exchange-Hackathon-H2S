@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art-O-Mart Monitoring Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1419;
+            color: #e6edf3;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .header h1 {
+            color: #f8fafc;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: #1e293b;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h3 {
+            color: #f8fafc;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-value.success { color: #10b981; }
+        .metric-value.warning { color: #f59e0b; }
+        .metric-value.error { color: #ef4444; }
+        .metric-value.info { color: #3b82f6; }
+        
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-indicator.online { background-color: #10b981; }
+        .status-indicator.offline { background-color: #ef4444; }
+        .status-indicator.warning { background-color: #f59e0b; }
+        
+        .service-list {
+            list-style: none;
+        }
+        
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        
+        .service-name {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .service-status {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+        
+        .alert {
+            background: #7f1d1d;
+            border: 1px solid #dc2626;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert h4 {
+            color: #fca5a5;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert p {
+            color: #fecaca;
+            font-size: 0.875rem;
+        }
+        
+        .logs-container {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .log-timestamp {
+            color: #6b7280;
+        }
+        
+        .log-level {
+            font-weight: 600;
+            margin: 0 0.5rem;
+        }
+        
+        .log-level.error { color: #ef4444; }
+        .log-level.warn { color: #f59e0b; }
+        .log-level.info { color: #3b82f6; }
+        .log-level.debug { color: #8b5cf6; }
+        
+        .refresh-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Art-O-Mart Monitoring Dashboard</h1>
+        <p class="subtitle">Real-time system health and performance monitoring</p>
+    </div>
+
+    <div class="container">
+        <!-- Alerts Section -->
+        <div id="alerts-container"></div>
+
+        <!-- Main Metrics Grid -->
+        <div class="dashboard-grid">
+            <!-- System Health -->
+            <div class="card">
+                <h3>System Health</h3>
+                <div class="metric-value success" id="health-status">Healthy</div>
+                <div class="metric-label">Overall system status</div>
+                <ul class="service-list" id="service-list">
+                    <li class="service-item">
+                        <span class="status-indicator online"></span>
+                        <span class="service-name">Frontend (Vercel)</span>
+                        <span class="service-status">Online</span>
+                    </li>
+                    <li class="service-item">
+                        <span class="status-indicator online"></span>
+                        <span class="service-name">Backend API</span>
+                        <span class="service-status">Online</span>
+                    </li>
+                    <li class="service-item">
+                        <span class="status-indicator online"></span>
+                        <span class="service-name">Database (Supabase)</span>
+                        <span class="service-status">Online</span>
+                    </li>
+                    <li class="service-item">
+                        <span class="status-indicator warning"></span>
+                        <span class="service-name">CDN</span>
+                        <span class="service-status">Degraded</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Response Time -->
+            <div class="card">
+                <h3>Response Time</h3>
+                <div class="metric-value info" id="response-time">245ms</div>
+                <div class="metric-label">Average API response time</div>
+                <div class="chart-container">
+                    <canvas id="response-time-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Error Rate -->
+            <div class="card">
+                <h3>Error Rate</h3>
+                <div class="metric-value success" id="error-rate">0.12%</div>
+                <div class="metric-label">Errors per total requests (last hour)</div>
+                <div class="chart-container">
+                    <canvas id="error-rate-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Active Users -->
+            <div class="card">
+                <h3>Active Users</h3>
+                <div class="metric-value info" id="active-users">1,247</div>
+                <div class="metric-label">Currently online users</div>
+                <div class="chart-container">
+                    <canvas id="users-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- CDN Performance -->
+            <div class="card">
+                <h3>CDN Performance</h3>
+                <div class="metric-value warning" id="cdn-cache-hit">87%</div>
+                <div class="metric-label">Cache hit ratio</div>
+                <div class="chart-container">
+                    <canvas id="cdn-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Database Metrics -->
+            <div class="card">
+                <h3>Database Performance</h3>
+                <div class="metric-value success" id="db-connections">47/100</div>
+                <div class="metric-label">Active connections</div>
+                <div style="margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #94a3b8;">Query Time:</span>
+                        <span id="db-query-time">12.3ms</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #94a3b8;">Slow Queries:</span>
+                        <span id="db-slow-queries">3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="dashboard-grid">
+            <!-- Traffic Overview -->
+            <div class="card" style="grid-column: span 2;">
+                <h3>Traffic Overview (Last 24 Hours)</h3>
+                <div class="chart-container">
+                    <canvas id="traffic-overview-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="card">
+                <h3>Core Web Vitals</h3>
+                <div class="chart-container">
+                    <canvas id="web-vitals-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>Recent Logs</h3>
+                <button class="refresh-btn" onclick="refreshLogs()">
+                    <span id="refresh-spinner" style="display: none;" class="loading"></span>
+                    Refresh
+                </button>
+            </div>
+            <div class="logs-container" id="logs-container">
+                <!-- Logs will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard Data and Configuration
+        const dashboardConfig = {
+            refreshInterval: 30000, // 30 seconds
+            apiEndpoint: '/api/monitoring',
+            charts: {}
+        };
+
+        // Mock data for demonstration
+        const mockData = {
+            responseTime: [245, 238, 267, 234, 289, 245, 256, 243, 251, 247],
+            errorRate: [0.12, 0.08, 0.15, 0.11, 0.09, 0.13, 0.07, 0.12, 0.10, 0.12],
+            activeUsers: [1247, 1156, 1389, 1445, 1523, 1467, 1389, 1278, 1345, 1247],
+            cdnCacheHit: [87, 89, 85, 91, 88, 87, 90, 86, 89, 87],
+            traffic: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                requests: [450, 423, 387, 356, 389, 445, 567, 689, 756, 834, 923, 1045, 1167, 1234, 1189, 1067, 945, 823, 734, 656, 578, 523, 478, 445],
+                errors: [2, 1, 3, 2, 1, 2, 4, 3, 2, 3, 4, 5, 3, 4, 2, 3, 2, 1, 2, 1, 1, 2, 1, 2]
+            },
+            webVitals: {
+                lcp: 2.1, // Largest Contentful Paint
+                fid: 15,  // First Input Delay
+                cls: 0.08 // Cumulative Layout Shift
+            }
+        };
+
+        // Initialize Dashboard
+        function initializeDashboard() {
+            setupCharts();
+            loadMetrics();
+            loadLogs();
+            startAutoRefresh();
+        }
+
+        // Setup Chart.js charts
+        function setupCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { 
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af' }
+                    },
+                    y: { 
+                        grid: { color: '#374151' },
+                        ticks: { color: '#9ca3af' }
+                    }
+                }
+            };
+
+            // Response Time Chart
+            dashboardConfig.charts.responseTime = new Chart(
+                document.getElementById('response-time-chart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 10}, (_, i) => `${i+1}m`),
+                        datasets: [{
+                            data: mockData.responseTime,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: chartOptions
+                }
+            );
+
+            // Error Rate Chart
+            dashboardConfig.charts.errorRate = new Chart(
+                document.getElementById('error-rate-chart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 10}, (_, i) => `${i+1}m`),
+                        datasets: [{
+                            data: mockData.errorRate,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: chartOptions
+                }
+            );
+
+            // Active Users Chart
+            dashboardConfig.charts.users = new Chart(
+                document.getElementById('users-chart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 10}, (_, i) => `${i+1}m`),
+                        datasets: [{
+                            data: mockData.activeUsers,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: chartOptions
+                }
+            );
+
+            // CDN Chart
+            dashboardConfig.charts.cdn = new Chart(
+                document.getElementById('cdn-chart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 10}, (_, i) => `${i+1}m`),
+                        datasets: [{
+                            data: mockData.cdnCacheHit,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: chartOptions
+                }
+            );
+
+            // Traffic Overview Chart
+            dashboardConfig.charts.traffic = new Chart(
+                document.getElementById('traffic-overview-chart'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: mockData.traffic.labels,
+                        datasets: [
+                            {
+                                label: 'Requests',
+                                data: mockData.traffic.requests,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Errors',
+                                data: mockData.traffic.errors,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: {
+                            legend: { display: true, labels: { color: '#e5e7eb' } }
+                        },
+                        scales: {
+                            x: chartOptions.scales.x,
+                            y: { ...chartOptions.scales.y, position: 'left' },
+                            y1: { 
+                                ...chartOptions.scales.y, 
+                                position: 'right',
+                                grid: { drawOnChartArea: false }
+                            }
+                        }
+                    }
+                }
+            );
+
+            // Web Vitals Chart
+            dashboardConfig.charts.webVitals = new Chart(
+                document.getElementById('web-vitals-chart'),
+                {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['LCP (Good)', 'FID (Good)', 'CLS (Good)'],
+                        datasets: [{
+                            data: [75, 90, 85],
+                            backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                position: 'bottom',
+                                labels: { color: '#e5e7eb', padding: 20 }
+                            }
+                        }
+                    }
+                }
+            );
+        }
+
+        // Load metrics from API or mock data
+        function loadMetrics() {
+            // Update metric values
+            document.getElementById('response-time').textContent = mockData.responseTime[mockData.responseTime.length - 1] + 'ms';
+            document.getElementById('error-rate').textContent = mockData.errorRate[mockData.errorRate.length - 1].toFixed(2) + '%';
+            document.getElementById('active-users').textContent = mockData.activeUsers[mockData.activeUsers.length - 1].toLocaleString();
+            document.getElementById('cdn-cache-hit').textContent = mockData.cdnCacheHit[mockData.cdnCacheHit.length - 1] + '%';
+            
+            // Database metrics
+            document.getElementById('db-query-time').textContent = '12.3ms';
+            document.getElementById('db-slow-queries').textContent = '3';
+
+            // Update chart colors based on thresholds
+            updateMetricColors();
+        }
+
+        // Update metric colors based on values
+        function updateMetricColors() {
+            const responseTime = parseFloat(document.getElementById('response-time').textContent);
+            const errorRate = parseFloat(document.getElementById('error-rate').textContent);
+            
+            // Response time coloring
+            const responseTimeEl = document.getElementById('response-time');
+            responseTimeEl.className = 'metric-value ' + (responseTime < 200 ? 'success' : responseTime < 500 ? 'warning' : 'error');
+            
+            // Error rate coloring
+            const errorRateEl = document.getElementById('error-rate');
+            errorRateEl.className = 'metric-value ' + (errorRate < 0.1 ? 'success' : errorRate < 1 ? 'warning' : 'error');
+        }
+
+        // Load recent logs
+        function loadLogs() {
+            const logsContainer = document.getElementById('logs-container');
+            const mockLogs = [
+                { timestamp: new Date(), level: 'info', message: 'Application started successfully' },
+                { timestamp: new Date(Date.now() - 60000), level: 'warn', message: 'High memory usage detected: 78%' },
+                { timestamp: new Date(Date.now() - 120000), level: 'error', message: 'Database connection timeout for user query' },
+                { timestamp: new Date(Date.now() - 180000), level: 'info', message: 'CDN cache refreshed for product images' },
+                { timestamp: new Date(Date.now() - 240000), level: 'debug', message: 'Processing batch job: product-sync-12345' },
+                { timestamp: new Date(Date.now() - 300000), level: 'info', message: 'User authentication successful' },
+                { timestamp: new Date(Date.now() - 360000), level: 'warn', message: 'API rate limit approached for endpoint /api/products' }
+            ];
+
+            logsContainer.innerHTML = mockLogs.map(log => `
+                <div class="log-entry">
+                    <span class="log-timestamp">${log.timestamp.toLocaleTimeString()}</span>
+                    <span class="log-level ${log.level}">${log.level.toUpperCase()}</span>
+                    <span>${log.message}</span>
+                </div>
+            `).join('');
+        }
+
+        // Refresh logs
+        function refreshLogs() {
+            const spinner = document.getElementById('refresh-spinner');
+            spinner.style.display = 'inline-block';
+            
+            setTimeout(() => {
+                loadLogs();
+                spinner.style.display = 'none';
+            }, 1000);
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh() {
+            setInterval(() => {
+                loadMetrics();
+                updateCharts();
+            }, dashboardConfig.refreshInterval);
+        }
+
+        // Update charts with new data
+        function updateCharts() {
+            // Simulate new data points
+            Object.values(dashboardConfig.charts).forEach(chart => {
+                if (chart && chart.data && chart.data.datasets) {
+                    chart.data.datasets.forEach(dataset => {
+                        if (dataset.data) {
+                            // Remove first data point and add new one
+                            dataset.data.shift();
+                            dataset.data.push(Math.floor(Math.random() * 100) + 200);
+                        }
+                    });
+                    chart.update('none');
+                }
+            });
+        }
+
+        // Show alerts if any
+        function showAlerts() {
+            const alertsContainer = document.getElementById('alerts-container');
+            const alerts = [
+                {
+                    type: 'warning',
+                    title: 'CDN Performance Degraded',
+                    message: 'Cache hit ratio has dropped below 90%. Consider investigating origin server performance.',
+                    timestamp: new Date()
+                }
+            ];
+
+            if (alerts.length > 0) {
+                alertsContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert">
+                        <h4>⚠️ ${alert.title}</h4>
+                        <p>${alert.message}</p>
+                        <small style="color: #9ca3af;">Detected at ${alert.timestamp.toLocaleTimeString()}</small>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDashboard();
+            showAlerts();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            Object.values(dashboardConfig.charts).forEach(chart => {
+                if (chart && chart.resize) {
+                    chart.resize();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

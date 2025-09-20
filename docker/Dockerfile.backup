@@ -1,0 +1,31 @@
+# Backup Service Dockerfile
+FROM alpine:latest
+
+# Install required packages
+RUN apk add --no-cache \
+    postgresql-client \
+    aws-cli \
+    curl \
+    bash \
+    dcron \
+    tzdata
+
+# Create backup user
+RUN adduser -D -s /bin/bash backup
+
+# Create directories
+RUN mkdir -p /backups /scripts
+RUN chown -R backup:backup /backups /scripts
+
+# Copy backup scripts
+COPY scripts/backup.sh /scripts/backup.sh
+RUN chmod +x /scripts/backup.sh
+
+# Create crontab for automated backups
+RUN echo "0 2 * * * /scripts/backup.sh" | crontab -u backup -
+
+USER backup
+
+WORKDIR /backups
+
+CMD ["crond", "-f"]
