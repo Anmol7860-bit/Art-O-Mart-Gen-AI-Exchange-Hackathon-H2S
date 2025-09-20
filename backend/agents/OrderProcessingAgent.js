@@ -132,7 +132,7 @@ const inventoryResponseSchema = z.object({
 
 export class OrderProcessingAgent extends BaseAgent {
   constructor() {
-    super('orderProcessing');
+    super('order-processor');
   }
 
   /**

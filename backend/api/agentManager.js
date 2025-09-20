@@ -27,11 +27,27 @@ class AgentManager extends EventEmitter {
    * Available agent types and their constructors
    */
   static agentTypes = {
-    productRecommendation: ProductRecommendationAgent,
-    customerSupport: CustomerSupportAgent,
-    artisanAssistant: ArtisanAssistantAgent,
-    orderProcessing: OrderProcessingAgent,
-    contentGeneration: ContentGenerationAgent
+    'content-optimizer': ProductRecommendationAgent,
+    'customer-support': CustomerSupportAgent,
+    'market-analyzer': ArtisanAssistantAgent,
+    'order-processor': OrderProcessingAgent,
+    'customer-insights': ContentGenerationAgent
+  };
+
+  /**
+   * Agent type aliases mapping for backward compatibility
+   */
+  static agentAliases = {
+    ProductRecommendationAgent: 'content-optimizer',
+    CustomerSupportAgent: 'customer-support',
+    ArtisanAssistantAgent: 'market-analyzer',
+    OrderProcessingAgent: 'order-processor',
+    ContentGenerationAgent: 'customer-insights',
+    productRecommendation: 'content-optimizer',
+    customerSupport: 'customer-support',
+    artisanAssistant: 'market-analyzer',
+    orderProcessing: 'order-processor',
+    contentGeneration: 'customer-insights'
   };
 
   /**
@@ -203,6 +219,17 @@ class AgentManager extends EventEmitter {
   }
 }
 
+/**
+ * Normalize agent type input to canonical format
+ * @param {string} input - Agent type input (can be alias or canonical)
+ * @returns {string} Canonical agent type
+ */
+export function normalizeAgentType(input) {
+  const key = String(input);
+  return AgentManager.agentAliases[key] || key;
+}
+
 // Create and export singleton instance
 const agentManager = new AgentManager();
 export default agentManager;
+export { AgentManager };

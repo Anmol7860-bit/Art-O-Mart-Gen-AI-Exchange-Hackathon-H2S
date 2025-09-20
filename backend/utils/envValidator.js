@@ -160,6 +160,16 @@ const OPTIONAL_VARS = {
       return null;
     }
   },
+  RATE_LIMIT_MAX_REQUESTS: {
+    default: '100',
+    validator: (value) => {
+      const max = parseInt(value);
+      if (isNaN(max) || max < 1) {
+        return 'RATE_LIMIT_MAX_REQUESTS must be a positive integer';
+      }
+      return null;
+    }
+  },
   RATE_LIMIT_WINDOW_MS: {
     default: '900000',
     validator: (value) => {
@@ -380,9 +390,22 @@ export function initializeEnvironment() {
   }
   
   if (validation.warnings.length > 0) {
-    console.warn('\\n' + formatValidationResults(validation));
+    console.warn('\n' + formatValidationResults(validation));
+  }
+  
+  // Add legacy compatibility mapping for RATE_LIMIT_MAX_REQUESTS -> RATE_LIMIT_MAX
+  const validatedVars = validation.validatedVars;
+  
+  // Map RATE_LIMIT_MAX_REQUESTS to RATE_LIMIT_MAX if not set
+  if (validatedVars.RATE_LIMIT_MAX_REQUESTS && !validatedVars.RATE_LIMIT_MAX) {
+    validatedVars.RATE_LIMIT_MAX = validatedVars.RATE_LIMIT_MAX_REQUESTS;
+  }
+  
+  // Map RATE_LIMIT_MAX to RATE_LIMIT_MAX_REQUESTS if not set
+  if (validatedVars.RATE_LIMIT_MAX && !validatedVars.RATE_LIMIT_MAX_REQUESTS) {
+    validatedVars.RATE_LIMIT_MAX_REQUESTS = validatedVars.RATE_LIMIT_MAX;
   }
   
   console.log('✅ Environment validation completed successfully!');
-  return validation.validatedVars;
+  return validatedVars;
 }

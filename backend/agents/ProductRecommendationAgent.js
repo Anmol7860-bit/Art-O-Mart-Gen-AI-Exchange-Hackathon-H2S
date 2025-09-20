@@ -27,7 +27,7 @@ const ProductRecommendationSchema = z.object({
 
 export class ProductRecommendationAgent extends BaseAgent {
   constructor() {
-    super('productRecommendation');
+    super('content-optimizer');
   }
 
   /**

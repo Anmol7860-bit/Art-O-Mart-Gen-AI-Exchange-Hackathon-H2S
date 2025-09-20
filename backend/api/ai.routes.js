@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate, validateRequest, rateLimits } from './middleware.js';
-import agentManager from './agentManager.js';
+import agentManager, { normalizeAgentType } from './agentManager.js';
 
 const router = Router();
 
@@ -61,16 +61,16 @@ router.post('/chat',
       let agentType;
       switch (context.type) {
         case 'product':
-          agentType = 'productRecommendation';
+          agentType = normalizeAgentType('productRecommendation');
           break;
         case 'support':
-          agentType = 'customerSupport';
+          agentType = normalizeAgentType('customerSupport');
           break;
         case 'artisan':
-          agentType = 'artisanAssistant';
+          agentType = normalizeAgentType('artisanAssistant');
           break;
         case 'order':
-          agentType = 'orderProcessing';
+          agentType = normalizeAgentType('orderProcessing');
           break;
         default:
           throw new Error('Invalid context type');
@@ -104,7 +104,7 @@ router.post('/generate',
   async (req, res, next) => {
     try {
       const { type, input, parameters } = req.validated.body;
-      const agent = agentManager.agents.get('contentGeneration');
+      const agent = agentManager.agents.get(normalizeAgentType('contentGeneration'));
 
       let result;
       switch (type) {
@@ -151,19 +151,19 @@ router.post('/analyze',
       let method;
       switch (type) {
         case 'business_insights':
-          agentType = 'artisanAssistant';
+          agentType = normalizeAgentType('artisanAssistant');
           method = 'getBusinessInsights';
           break;
         case 'market_analysis':
-          agentType = 'artisanAssistant';
+          agentType = normalizeAgentType('artisanAssistant');
           method = 'suggestPricing';
           break;
         case 'customer_feedback':
-          agentType = 'customerSupport';
+          agentType = normalizeAgentType('customerSupport');
           method = 'analyzeFeedback';
           break;
         case 'performance_metrics':
-          agentType = 'orderProcessing';
+          agentType = normalizeAgentType('orderProcessing');
           method = 'analyzePerformance';
           break;
         default:

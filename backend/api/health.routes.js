@@ -27,10 +27,7 @@ router.get('/', async (req, res) => {
     }
   };
 
-  res.json({
-    success: true,
-    data: systemHealth
-  });
+  res.json(systemHealth);
 });
 
 /**
@@ -59,10 +56,8 @@ router.get('/agents', async (req, res) => {
     agentHealth.status = 'degraded';
   }
 
-  res.json({
-    success: true,
-    data: agentHealth
-  });
+  const statusCode = agentHealth.status === 'degraded' ? 503 : 200;
+  res.status(statusCode).json(agentHealth);
 });
 
 /**
@@ -75,33 +70,26 @@ router.get('/database', async (req, res) => {
     const { data, error } = await supabaseAdmin.rpc('health_check');
     const responseTime = Date.now() - startTime;
 
-    const dbHealth = {
-      status: error ? 'unhealthy' : 'healthy',
-      timestamp: new Date().toISOString(),
-      responseTime,
-      error: error?.message,
-      details: {
-        connected: !error,
-        version: data?.version,
-        lastError: error?.message || null
-      }
-    };
+    const isHealthy = !error;
+    const statusCode = isHealthy ? 200 : 503;
 
-    res.json({
-      success: true,
-      data: dbHealth
+    res.status(statusCode).json({
+      status: isHealthy ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: isHealthy,
+        responseTime,
+        version: data?.version ?? null,
+        lastError: error?.message ?? null
+      }
     });
   } catch (error) {
-    res.json({
-      success: false,
-      data: {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: error.message,
-        details: {
-          connected: false,
-          lastError: error.message
-        }
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: false,
+        lastError: error.message
       }
     });
   }
@@ -126,34 +114,24 @@ router.get('/ai', async (req, res) => {
 
     const responseTime = Date.now() - startTime;
 
-    const aiHealth = {
+    res.status(200).json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      responseTime,
-      provider: 'Google Gemini',
-      model: process.env.AI_MODEL || 'gemini-2.0-flash-001',
-      details: {
+      ai: {
+        provider: 'Google Gemini',
+        model: process.env.AI_MODEL ?? 'gemini-2.0-flash-001',
         connected: true,
-        lastError: null
+        responseTime
       }
-    };
-
-    res.json({
-      success: true,
-      data: aiHealth
     });
   } catch (error) {
-    res.json({
-      success: false,
-      data: {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      ai: {
         provider: 'Google Gemini',
-        error: error.message,
-        details: {
-          connected: false,
-          lastError: error.message
-        }
+        connected: false,
+        lastError: error.message
       }
     });
   }
@@ -162,73 +140,106 @@ router.get('/ai', async (req, res) => {
 // Combined health check that aggregates all metrics
 router.get('/all', async (req, res) => {
   try {
-    const [system, agents, database, ai] = await Promise.all([
-      // System health
-      {
-        status: 'healthy',
-        uptime: process.uptime(),
-        memory: {
-          total: os.totalmem(),
-          free: os.freemem(),
-          used: os.totalmem() - os.freemem()
-        }
-      },
-      // Agent health
-      agentManager.getAllAgentStatus(),
-      // Database health
-      supabaseAdmin.rpc('health_check'),
-      // AI health
-      geminiClient.getGenerativeModel({
-        model: process.env.AI_MODEL || 'gemini-2.0-flash-001'
-      }).generateContent({
-        contents: [{ role: 'user', parts: [{ text: 'Test connection' }] }]
-      })
-    ]);
-
-    const health = {
+    // Build system health
+    const system = {
       status: 'healthy',
-      timestamp: new Date().toISOString(),
-      components: {
-        system: {
-          status: 'healthy',
-          metrics: system
-        },
-        agents: {
-          status: Object.values(agents).some(a => a.status === 'error')
-            ? 'degraded'
-            : 'healthy',
-          metrics: agents
-        },
-        database: {
-          status: database.error ? 'unhealthy' : 'healthy',
-          error: database.error?.message
-        },
-        ai: {
-          status: 'healthy',
-          provider: 'Google Gemini'
-        }
+      uptime: process.uptime(),
+      memory: {
+        total: os.totalmem(),
+        free: os.freemem(),
+        used: os.totalmem() - os.freemem()
       }
     };
 
-    // Determine overall status
-    if (Object.values(health.components).some(c => c.status === 'unhealthy')) {
-      health.status = 'unhealthy';
-    } else if (Object.values(health.components).some(c => c.status === 'degraded')) {
-      health.status = 'degraded';
+    // Build agents health
+    const agentStatus = agentManager.getAllAgentStatus();
+    const agents = {
+      status: Object.values(agentStatus).some(a => a.status === 'error')
+        ? 'degraded'
+        : 'healthy',
+      agents: agentStatus,
+      metrics: {
+        totalAgents: agentManager.agents.size,
+        activeAgents: Array.from(agentManager.agents.values()).filter(
+          agent => agent.state !== 'stopped'
+        ).length
+      }
+    };
+
+    // Build database health
+    let database;
+    try {
+      const startTime = Date.now();
+      const { data, error } = await supabaseAdmin.rpc('health_check');
+      const responseTime = Date.now() - startTime;
+      const isHealthy = !error;
+      
+      database = {
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        connected: isHealthy,
+        responseTime,
+        version: data?.version ?? null,
+        lastError: error?.message ?? null
+      };
+    } catch (error) {
+      database = {
+        status: 'unhealthy',
+        connected: false,
+        lastError: error.message
+      };
     }
 
-    res.json({
-      success: true,
-      data: health
+    // Build AI health
+    let ai;
+    try {
+      const startTime = Date.now();
+      const model = geminiClient.getGenerativeModel({
+        model: process.env.AI_MODEL || 'gemini-2.0-flash-001'
+      });
+      await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: 'Test connection' }] }]
+      });
+      const responseTime = Date.now() - startTime;
+      
+      ai = {
+        status: 'healthy',
+        provider: 'Google Gemini',
+        model: process.env.AI_MODEL ?? 'gemini-2.0-flash-001',
+        connected: true,
+        responseTime
+      };
+    } catch (error) {
+      ai = {
+        status: 'unhealthy',
+        provider: 'Google Gemini',
+        connected: false,
+        lastError: error.message
+      };
+    }
+
+    // Determine overall status
+    const overallStatus = [database.status, ai.status, agents.status, system.status]
+      .includes('unhealthy') ? 'unhealthy' 
+      : [database.status, ai.status, agents.status, system.status]
+        .includes('degraded') ? 'degraded' 
+        : 'healthy';
+
+    const statusCode = overallStatus === 'healthy' ? 200 : 503;
+
+    res.status(statusCode).json({
+      status: overallStatus,
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database,
+      ai,
+      agents,
+      system
     });
   } catch (error) {
-    res.json({
-      success: false,
-      data: {
-        status: 'unhealthy',
-        timestamp: new Date().toISOString(),
-        error: error.message
-      }
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      message: error.message
     });
   }
 });

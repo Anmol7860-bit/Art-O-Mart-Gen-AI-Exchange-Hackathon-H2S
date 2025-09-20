@@ -122,7 +122,7 @@ const listingContentSchema = z.object({
 
 export class ArtisanAssistantAgent extends BaseAgent {
   constructor() {
-    super('artisanAssistant');
+    super('market-analyzer');
   }
 
   /**

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate, validateRequest, requireRole, rateLimits } from './middleware.js';
-import agentManager from './agentManager.js';
+import agentManager, { normalizeAgentType, AgentManager } from './agentManager.js';
 
 const router = Router();
 
@@ -18,13 +18,13 @@ const agentTaskSchema = z.object({
     parameters: z.record(z.any()).optional()
   }),
   params: z.object({
-    agentType: z.enum(Object.keys(agentManager.constructor.agentTypes))
+    agentType: z.string().transform(normalizeAgentType).refine(v => v in AgentManager.agentTypes, 'Unknown agent type')
   })
 });
 
 const agentTypeParamSchema = z.object({
   params: z.object({
-    agentType: z.enum(Object.keys(agentManager.constructor.agentTypes))
+    agentType: z.string().transform(normalizeAgentType).refine(v => v in AgentManager.agentTypes, 'Unknown agent type')
   })
 });
 
@@ -44,6 +44,19 @@ router.get('/',
     } catch (error) {
       next(error);
     }
+  }
+);
+
+/**
+ * Get agent status summary
+ * GET /api/agents/status
+ */
+router.get('/status',
+  authenticate,
+  (req, res) => {
+    res.json({
+      agents: agentManager.getAllAgentStatus()
+    });
   }
 );
 

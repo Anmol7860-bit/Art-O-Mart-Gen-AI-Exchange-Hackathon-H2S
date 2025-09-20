@@ -2,7 +2,7 @@ import BaseAgent from './BaseAgent.js';
 
 export class CustomerSupportAgent extends BaseAgent {
   constructor() {
-    super('customerSupport');
+    super('customer-support');
   }
 
   /**

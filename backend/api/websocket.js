@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '../config/database.js';
-import agentManager from './agentManager.js';
+import { getAllowedOrigins } from '../middleware/cors.js';
 
 // Event types for WebSocket communication
 const EventTypes = {
@@ -19,21 +20,42 @@ const EventTypes = {
   },
   SYSTEM: {
     ERROR: 'system-error',
-    NOTIFICATION: 'system-notification'
+    NOTIFICATION: 'system-notification',
+    HEALTH: 'system-health',
+    SERVER_READY: 'system-server-ready',
+    SHUTDOWN: 'system-shutdown'
   }
 };
 
 class WebSocketManager {
-  constructor(server) {
-    this.io = new Server(server, {
-      cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-        methods: ['GET', 'POST']
-      }
-    });
+  constructor(serverOrIo, agentManager) {
+    // Store references
+    this.agentManager = agentManager;
+    
+    // Accept either an HTTP server or a pre-created Socket.IO instance
+    if (serverOrIo instanceof Server) {
+      // Pre-created Socket.IO instance
+      this.io = serverOrIo;
+      this.server = null;
+    } else {
+      // HTTP server - create Socket.IO instance
+      this.server = serverOrIo;
+      this.io = new Server(serverOrIo, {
+        cors: {
+          origin: (origin, callback) => {
+            const allowedOrigins = getAllowedOrigins();
+            const isAllowed = !origin || allowedOrigins.includes(origin);
+            callback(null, isAllowed);
+          },
+          methods: ['GET', 'POST'],
+          credentials: true
+        }
+      });
+    }
 
     this.userSessions = new Map();
     this.messageBuffer = new Map();
+    this.connectedClients = new Set();
     this.setupAuthMiddleware();
     this.setupEventHandlers();
     this.setupAgentEventListeners();
@@ -50,14 +72,15 @@ class WebSocketManager {
           return next(new Error('Authentication required'));
         }
 
-        const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-        if (error || !user) {
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (!decoded) {
           return next(new Error('Invalid token'));
         }
 
         // Attach user data to socket
-        socket.user = user;
-        socket.join(`user:${user.id}`);
+        socket.user = decoded;
+        socket.join(`user:${decoded.id}`);
         next();
       } catch (error) {
         next(error);
@@ -70,31 +93,39 @@ class WebSocketManager {
    */
   setupEventHandlers() {
     this.io.on('connection', (socket) => {
-      console.log(`Client connected: ${socket.id}`);
-      this.userSessions.set(socket.user.id, socket.id);
+      console.log(`Client connected: ${socket.id} (User: ${socket.user?.id})`);
+      this.connectedClients.add(socket.id);
+      this.userSessions.set(socket.user?.id || socket.id, socket.id);
 
-      // Subscribe to agent events
-      socket.on('subscribe-agent', (agentType) => {
-        if (agentManager.constructor.agentTypes[agentType]) {
-          socket.join(`agent:${agentType}`);
-        }
+      // Handle both subscribe and subscribe-agent events
+      socket.on('subscribe', (channel) => {
+        this.handleSubscription(socket, channel);
       });
 
-      // Unsubscribe from agent events
+      socket.on('subscribe-agent', (agentType) => {
+        this.handleSubscription(socket, `agent:${agentType}`);
+      });
+
+      // Handle both unsubscribe and unsubscribe-agent events
+      socket.on('unsubscribe', (channel) => {
+        this.handleUnsubscription(socket, channel);
+      });
+
       socket.on('unsubscribe-agent', (agentType) => {
-        socket.leave(`agent:${agentType}`);
+        this.handleUnsubscription(socket, `agent:${agentType}`);
       });
 
       // Handle disconnection
       socket.on('disconnect', () => {
         console.log(`Client disconnected: ${socket.id}`);
-        this.userSessions.delete(socket.user.id);
+        this.connectedClients.delete(socket.id);
+        this.userSessions.delete(socket.user?.id || socket.id);
       });
 
       // Error handling
       socket.on('error', (error) => {
         console.error(`Socket error for ${socket.id}:`, error);
-        this.emitToUser(socket.user.id, EventTypes.SYSTEM.ERROR, {
+        this.emitToUser(socket.user?.id, EventTypes.SYSTEM.ERROR, {
           message: 'WebSocket error occurred',
           error: error.message
         });
@@ -103,60 +134,169 @@ class WebSocketManager {
   }
 
   /**
+   * Handle subscription to channels
+   */
+  handleSubscription(socket, channel) {
+    const validChannels = ['agents', 'system', 'ai'];
+    
+    // Normalize channel names
+    if (channel.startsWith('agent:')) {
+      socket.join(channel);
+      socket.emit('subscribed', channel);
+      return;
+    }
+    
+    if (validChannels.includes(channel)) {
+      socket.join(channel);
+      socket.emit('subscribed', channel);
+    } else {
+      socket.emit('error', `Invalid channel: ${channel}`);
+    }
+  }
+
+  /**
+   * Handle unsubscription from channels
+   */
+  handleUnsubscription(socket, channel) {
+    if (channel.startsWith('agent:')) {
+      socket.leave(channel);
+      socket.emit('unsubscribed', channel);
+      return;
+    }
+    
+    socket.leave(channel);
+    socket.emit('unsubscribed', channel);
+  }
+
+  /**
    * Setup event listeners for agent events
    */
   setupAgentEventListeners() {
+    if (!this.agentManager) return;
+    
     // Agent started event
-    agentManager.on(EventTypes.AGENT.STARTED, ({ type, config }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.STARTED, {
-        type,
+    this.agentManager.on('agent:started', ({ type, config }) => {
+      this.io.to(`agent:${type}`).emit('agent:started', {
+        agentType: type,
+        config,
+        timestamp: new Date().toISOString()
+      });
+      this.io.to('agents').emit('agent:started', {
+        agentType: type,
         config,
         timestamp: new Date().toISOString()
       });
     });
 
     // Agent stopped event
-    agentManager.on(EventTypes.AGENT.STOPPED, ({ type }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.STOPPED, {
-        type,
+    this.agentManager.on('agent:stopped', ({ type }) => {
+      this.io.to(`agent:${type}`).emit('agent:stopped', {
+        agentType: type,
+        timestamp: new Date().toISOString()
+      });
+      this.io.to('agents').emit('agent:stopped', {
+        agentType: type,
         timestamp: new Date().toISOString()
       });
     });
 
     // Agent error event
-    agentManager.on(EventTypes.AGENT.ERROR, ({ type, error }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.ERROR, {
-        type,
+    this.agentManager.on('agent:error', ({ type, error }) => {
+      this.io.to(`agent:${type}`).emit('agent:error', {
+        agentType: type,
+        error,
+  /**
+   * Setup event listeners for agent events
+   */
+  setupAgentEventListeners() {
+    if (!this.agentManager) return;
+    
+    // Agent started event
+    this.agentManager.on('agent:started', ({ type, config }) => {
+      this.io.to(`agent:${type}`).emit('agent:started', {
+        agentType: type,
+        config,
+        timestamp: new Date().toISOString()
+      });
+      this.io.to('agents').emit('agent:started', {
+        agentType: type,
+        config,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Agent stopped event
+    this.agentManager.on('agent:stopped', ({ type }) => {
+      this.io.to(`agent:${type}`).emit('agent:stopped', {
+        agentType: type,
+        timestamp: new Date().toISOString()
+      });
+      this.io.to('agents').emit('agent:stopped', {
+        agentType: type,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Agent error event
+    this.agentManager.on('agent:error', ({ type, error }) => {
+      this.io.to(`agent:${type}`).emit('agent:error', {
+        agentType: type,
         error,
         timestamp: new Date().toISOString()
       });
     });
 
-    // Task progress event
-    agentManager.on(EventTypes.AGENT.TASK_PROGRESS, ({ type, progress }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.TASK_PROGRESS, {
-        type,
-        progress,
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    // Task complete event
-    agentManager.on(EventTypes.AGENT.TASK_COMPLETE, ({ type, result }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.TASK_COMPLETE, {
-        type,
+    // Task completed event
+    this.agentManager.on('task:completed', ({ type, taskId, result }) => {
+      this.io.to(`agent:${type}`).emit('task:completed', {
+        agentType: type,
+        taskId,
         result,
         timestamp: new Date().toISOString()
       });
     });
+  }
 
-    // Cache cleared event
-    agentManager.on(EventTypes.AGENT.CACHE_CLEARED, ({ type }) => {
-      this.io.to(`agent:${type}`).emit(EventTypes.AGENT.CACHE_CLEARED, {
-        type,
+  /**
+   * Broadcast to a specific channel
+   */
+  broadcast(channel, event, data) {
+    if (channel === 'agents') {
+      this.io.to('agents').emit(event, {
+        ...data,
         timestamp: new Date().toISOString()
       });
-    });
+    } else if (channel === 'system') {
+      this.io.to('system').emit(event, {
+        ...data,
+        timestamp: new Date().toISOString()
+      });
+    } else if (channel.startsWith('agent:')) {
+      this.io.to(channel).emit(event, {
+        ...data,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Fallback to general broadcast
+      this.io.emit(event, {
+        ...data,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  /**
+   * Get active connections count
+   */
+  getActiveConnections() {
+    return this.connectedClients.size;
+  }
+
+  /**
+   * Close all connections
+   */
+  closeAllConnections() {
+    this.io.close();
   }
 
   /**

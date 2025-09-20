@@ -141,7 +141,7 @@ const seoOptimizationSchema = z.object({
 
 export class ContentGenerationAgent extends BaseAgent {
   constructor() {
-    super('contentGeneration');
+    super('customer-insights');
   }
 
   /**
