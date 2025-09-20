@@ -197,6 +197,7 @@ const ProductGrid = ({ filters, searchQuery }) => {
             onHoverStart={() => setHoveredProduct(product?.id)}
             onHoverEnd={() => setHoveredProduct(null)}
             className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-warm-md transition-all duration-300 cursor-pointer"
+            data-testid="product-card"
           >
             {/* Product Image */}
             <div className="relative aspect-square overflow-hidden">
@@ -204,6 +205,7 @@ const ProductGrid = ({ filters, searchQuery }) => {
                 src={getProductImage(product, hoveredProduct === product?.id)}
                 alt={product?.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                data-testid="product-image"
               />
               
               {/* Badges */}
@@ -250,7 +252,10 @@ const ProductGrid = ({ filters, searchQuery }) => {
             <div className="p-4 space-y-3">
               {/* Title and Rating */}
               <div className="space-y-1">
-                <h4 className="font-heading font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200">
+                <h4 
+                  className="font-heading font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200"
+                  data-testid="product-title"
+                >
                   {product?.title}
                 </h4>
                 <div className="flex items-center space-x-2">
@@ -272,7 +277,10 @@ const ProductGrid = ({ filters, searchQuery }) => {
 
               {/* Price */}
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold text-foreground">
+                <span 
+                  className="text-lg font-bold text-foreground"
+                  data-testid="product-price"
+                >
                   {formatPrice(product?.price)}
                 </span>
                 {product?.original_price && (
@@ -291,7 +299,10 @@ const ProductGrid = ({ filters, searchQuery }) => {
                     className="w-6 h-6 rounded-full object-cover"
                   />
                 )}
-                <span className="text-sm text-muted-foreground">
+                <span 
+                  className="text-sm text-muted-foreground"
+                  data-testid="artisan-name"
+                >
                   by {product?.artisan?.name || 'Unknown Artisan'}
                 </span>
                 {product?.artisan?.verified && (

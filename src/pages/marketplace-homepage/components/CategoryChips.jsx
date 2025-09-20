@@ -6,6 +6,8 @@ const CategoryChips = ({ onCategoryChange, onFilterChange }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
   const [selectedPriceRange, setSelectedPriceRange] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
 
   const categories = [
     { id: 'all', name: 'All Categories', icon: 'Grid3X3', count: 1247 },
@@ -36,6 +38,18 @@ const CategoryChips = ({ onCategoryChange, onFilterChange }) => {
     { id: '5000-10000', name: '₹5,000 - ₹10,000', count: 156 },
     { id: 'above-10000', name: 'Above ₹10,000', count: 47 }
   ];
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setSearchResults({ query: searchQuery, count: 42 }); // Mock results
+      onFilterChange?.({
+        category: selectedCategory,
+        region: selectedRegion,
+        priceRange: selectedPriceRange,
+        searchQuery: searchQuery
+      });
+    }
+  };
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -92,6 +106,40 @@ const CategoryChips = ({ onCategoryChange, onFilterChange }) => {
           </button>
         )}
       </div>
+      
+      {/* Search Bar */}
+      <div className="flex items-center space-x-2">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="Search products..."
+            className="w-full px-4 py-2 pl-10 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none transition-colors duration-200"
+            data-testid="search-input"
+          />
+          <Icon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={!searchQuery.trim()}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          data-testid="search-button"
+        >
+          Search
+        </button>
+      </div>
+
+      {/* Search Results Display */}
+      {searchResults && (
+        <div className="p-4 bg-muted/50 rounded-lg" data-testid="search-results">
+          <p className="text-sm text-muted-foreground">
+            Found {searchResults.count} results for "{searchResults.query}"
+          </p>
+        </div>
+      )}
+      
       {/* Category Chips */}
       <div className="space-y-4">
         <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">

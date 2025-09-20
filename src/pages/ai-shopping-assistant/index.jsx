@@ -44,12 +44,12 @@ const AIShoppingAssistantContent = () => {
   useEffect(() => {
     if (!isConnected) return;
 
-    // Subscribe to AI responses
+    // Subscribe to AI responses - handle both camelCase and underscore formats
     const unsubscribeResponse = subscribe('ai-response', (data) => {
       setConversationHistory(prev => [...prev, {
         id: Date.now(),
         sender: 'ai',
-        agentType: data.agentType,
+        agentType: data.agent_type || data.agentType, // Support both formats
         timestamp: new Date(),
         text: data.message,
         products: data.products || [],
@@ -122,11 +122,11 @@ const AIShoppingAssistantContent = () => {
       message: 'Processing your request...'
     });
 
-    // Send message to agent
-    emit('ai-message', {
-      agentType: selectedAgent,
+    // Send message to agent using standardized event name and payload
+    emit('chat-message', {
       message,
-      taskId,
+      agent_type: selectedAgent, // Use underscore format for consistency with backend
+      task_id: taskId,
       preferences: userPreferences
     });
   };
@@ -134,8 +134,8 @@ const AIShoppingAssistantContent = () => {
   const handleCancelTask = () => {
     if (currentTask?.taskId) {
       emit('cancel-task', {
-        taskId: currentTask.taskId,
-        agentType: currentTask.agentType
+        task_id: currentTask.taskId,
+        agent_type: currentTask.agent_type || currentTask.agentType // Support both formats for now
       });
     }
   };

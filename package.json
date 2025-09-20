@@ -1,13 +1,26 @@
 {
   "name": "art-o-mart",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "start": "vite",
     "build": "vite build --sourcemap",
+    "build:prod": "vite build",
     "preview": "vite preview",
     "serve": "vite preview",
+    "test:e2e": "playwright test",
+    "test:integration": "jest --config=jest.config.js",
+    "test:all": "npm run test:integration && npm run test:e2e",
+    "deploy:vercel": "node scripts/deploy-frontend.js vercel",
+    "deploy:netlify": "node scripts/deploy-frontend.js netlify",
+    "deploy:aws": "node scripts/deploy-frontend.js aws",
+    "validate:deployment": "node scripts/validate-deployment.js --url=$DEPLOYMENT_URL",
+    "test:user-flows": "node scripts/test-user-flows.js --url=$BASE_URL",
     "db:status": "node scripts/db-status.js",
     "db:migrate": "supabase db push",
     "db:reset": "supabase db reset",
@@ -16,6 +29,7 @@
     "db:validate": "node scripts/db-validate.js"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^2.6.1",
     "@supabase/supabase-js": "^2.57.4",
@@ -58,7 +72,10 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.25.0",
+    "@babel/preset-react": "^7.24.0",
     "@dhiwise/component-tagger": "^1.0.10",
+    "@playwright/test": "^1.47.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.7",
@@ -69,6 +86,11 @@
     "@testing-library/user-event": "^12.8.3",
     "@vitejs/plugin-react": "4.3.4",
     "autoprefixer": "10.4.2",
+    "babel-jest": "^29.7.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "jest-transform-stub": "^2.0.0",
     "postcss": "8.4.8",
     "tailwindcss": "3.4.6",
     "tailwindcss-animate": "^1.0.7",

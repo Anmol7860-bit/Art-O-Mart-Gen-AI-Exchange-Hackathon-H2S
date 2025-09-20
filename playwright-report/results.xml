@@ -1,0 +1,295 @@
+<testsuites id="" name="" tests="7" failures="7" skipped="0" errors="0" time="87.49789200000001">
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="chromium" tests="1" failures="1" skipped="0" time="11.518" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="11.518">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [chromium] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        14 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="firefox" tests="1" failures="1" skipped="0" time="13.536" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="13.536">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [firefox] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        14 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="webkit" tests="1" failures="1" skipped="0" time="11.788" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="11.788">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [webkit] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        14 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="Mobile Chrome" tests="1" failures="1" skipped="0" time="11.762" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="11.762">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [Mobile Chrome] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        14 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="Mobile Safari" tests="1" failures="1" skipped="0" time="12.09" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="12.09">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [Mobile Safari] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        13 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="Microsoft Edge" tests="1" failures="1" skipped="0" time="0.002" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="0.002">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [Microsoft Edge] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: browserType.launch: Chromium distribution 'msedge' is not found at /Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge
+    Run "npx playwright install msedge"
+]]>
+</failure>
+</testcase>
+</testsuite>
+<testsuite name="marketplace.spec.js" timestamp="2025-09-20T19:24:23.532Z" hostname="Google Chrome" tests="1" failures="1" skipped="0" time="12.029" errors="0">
+<testcase name="Marketplace Browsing Tests › Homepage loads with featured products and categories" classname="marketplace.spec.js" time="12.029">
+<failure message="marketplace.spec.js:8:3 Homepage loads with featured products and categories" type="FAILURE">
+<![CDATA[  [Google Chrome] › marketplace.spec.js:8:3 › Marketplace Browsing Tests › Homepage loads with featured products and categories 
+
+    Error: expect(page).toHaveTitle(expected) failed
+
+    Expected pattern: /Art-O-Mart.*Marketplace/
+    Received string:  "Art O Mart - Handcrafted Artisan Marketplace"
+    Timeout: 10000ms
+
+    Call log:
+      - Expect "toHaveTitle" with timeout 10000ms
+        14 × unexpected value "Art O Mart - Handcrafted Artisan Marketplace"
+
+
+       8 |   test('Homepage loads with featured products and categories', async ({ page }) => {
+       9 |     // Check page title
+    > 10 |     await expect(page).toHaveTitle(/Art-O-Mart.*Marketplace/);
+         |                        ^
+      11 |     
+      12 |     // Verify main sections are present
+      13 |     await expect(page.locator('[data-testid="hero-carousel"]')).toBeVisible();
+        at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/video.webm]]
+
+[[ATTACHMENT|../test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

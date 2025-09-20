@@ -3,6 +3,22 @@
  * Validates required VITE_ prefixed environment variables for proper application configuration
  */
 
+/**
+ * Get environment variables from appropriate runtime context
+ * Prefer Vite env if present; fallback to process.env in Node.js
+ */
+function getRuntimeEnv() {
+  // Check if we're in a Vite/browser environment
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      return import.meta.env;
+    }
+  } catch (e) {
+    // Fall through to process.env
+  }
+  return process?.env ?? {};
+}
+
 // Required environment variables with their validation rules
 const REQUIRED_VARS = {
   VITE_SUPABASE_URL: {
@@ -39,13 +55,77 @@ const REQUIRED_VARS = {
       '2. Select your project > Settings > API',
       '3. Copy the anon public key'
     ]
+  },
+  VITE_WS_URL: {
+    required: false,
+    validator: (value) => {
+      if (!value) return null; // Optional in development
+      
+      // Check if it's a valid WebSocket URL format
+      if (!value.startsWith('ws://') && !value.startsWith('wss://') && !value.startsWith('http://') && !value.startsWith('https://')) {
+        return 'WebSocket URL must start with ws://, wss://, http://, or https://';
+      }
+      
+      // In production, require secure protocols
+      const ENV = getRuntimeEnv();
+      if (ENV.PROD) {
+        if (value.startsWith('ws://') || value.startsWith('http://')) {
+          return 'Production WebSocket URL must use secure protocols (wss:// or https://)';
+        }
+      }
+      
+      try {
+        new URL(value.replace('ws://', 'http://').replace('wss://', 'https://'));
+      } catch {
+        return 'Invalid WebSocket URL format';
+      }
+      
+      return null;
+    },
+    setupInstructions: [
+      '1. Get your backend WebSocket URL from deployment platform',
+      '2. For development: ws://localhost:5000',
+      '3. For production: wss://your-backend-domain.com',
+      '4. Ensure CORS is configured on backend for your domain'
+    ]
+  },
+  VITE_BACKEND_URL: {
+    required: false,
+    validator: (value) => {
+      if (!value) return null; // Optional, will derive from WS_URL
+      
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        return 'Backend URL must start with http:// or https://';
+      }
+      
+      // In production, require HTTPS
+      const ENV = getRuntimeEnv();
+      if (ENV.PROD && value.startsWith('http://')) {
+        return 'Production backend URL must use HTTPS';
+      }
+      
+      try {
+        new URL(value);
+      } catch {
+        return 'Invalid backend URL format';
+      }
+      
+      return null;
+    },
+    setupInstructions: [
+      '1. Get your backend API URL from deployment platform',
+      '2. For development: http://localhost:5000/api',
+      '3. For production: https://your-backend-domain.com/api',
+      '4. If not set, will derive from VITE_WS_URL'
+    ]
   }
 };
 
 // Optional environment variables with defaults
 const OPTIONAL_VARS = {
   VITE_API_URL: 'http://localhost:5000/api',
-  VITE_WS_URL: 'http://localhost:5000',
+  VITE_WS_URL: 'ws://localhost:5000',
+  VITE_BACKEND_URL: null, // Will derive from VITE_WS_URL if not set
   VITE_APP_NAME: 'Art-O-Mart',
   VITE_APP_VERSION: '1.0.0',
   VITE_ENABLE_AI_FEATURES: 'true',
@@ -59,7 +139,8 @@ const OPTIONAL_VARS = {
  * Validate a single environment variable
  */
 function validateEnvVar(key, config) {
-  const value = import.meta.env[key];
+  const ENV = getRuntimeEnv();
+  const value = ENV[key];
   
   if (config.required && !value) {
     return {
@@ -87,14 +168,27 @@ function validateEnvVar(key, config) {
  * Get environment variable value with fallback to default
  */
 export function getEnvVar(key, defaultValue = null) {
-  return import.meta.env[key] || OPTIONAL_VARS[key] || defaultValue;
+  const ENV = getRuntimeEnv();
+  const value = ENV[key] || OPTIONAL_VARS[key] || defaultValue;
+  
+  // Special handling for derived VITE_BACKEND_URL
+  if (key === 'VITE_BACKEND_URL' && !value) {
+    const wsUrl = ENV.VITE_WS_URL || OPTIONAL_VARS.VITE_WS_URL;
+    if (wsUrl) {
+      // Convert WebSocket URL to HTTP URL for API calls
+      return wsUrl.replace('ws://', 'http://').replace('wss://', 'https://');
+    }
+  }
+  
+  return value;
 }
 
 /**
  * Check if we're in development mode
  */
 export function isDevelopment() {
-  return import.meta.env.DEV;
+  const ENV = getRuntimeEnv();
+  return ENV.DEV || ENV.NODE_ENV !== 'production';
 }
 
 /**
@@ -131,8 +225,9 @@ export function validateEnvironment() {
   }
   
   // Check for missing optional variables and provide defaults
+  const ENV = getRuntimeEnv();
   for (const [key, defaultValue] of Object.entries(OPTIONAL_VARS)) {
-    if (!import.meta.env[key]) {
+    if (!ENV[key]) {
       warnings.push({
         variable: key,
         message: `Using default value: ${defaultValue}`,
@@ -214,17 +309,18 @@ export function formatSetupInstructions(validationResult) {
 // Log validation results in development
 if (isDevelopment()) {
   const validation = validateEnvironment();
+  const ENV = getRuntimeEnv();
   
   if (isDebugMode()) {
     console.group('🔍 Environment Validation');
     console.log('Validation Result:', validation);
     console.log('Environment Variables:', {
       ...Object.keys(REQUIRED_VARS).reduce((acc, key) => {
-        acc[key] = import.meta.env[key] ? '✓ Set' : '❌ Missing';
+        acc[key] = ENV[key] ? '✓ Set' : '❌ Missing';
         return acc;
       }, {}),
       ...Object.keys(OPTIONAL_VARS).reduce((acc, key) => {
-        acc[key] = import.meta.env[key] || `Default: ${OPTIONAL_VARS[key]}`;
+        acc[key] = ENV[key] || `Default: ${OPTIONAL_VARS[key]}`;
         return acc;
       }, {})
     });

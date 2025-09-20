@@ -1,0 +1,122 @@
+# Art-O-Mart Frontend Netlify Configuration
+# 
+# DEPLOYMENT SETUP:
+# 1. Update backend URL in the API proxy redirect below
+# 2. Set environment variables in Netlify dashboard:
+#    - VITE_SUPABASE_URL
+#    - VITE_SUPABASE_ANON_KEY
+#    - VITE_WS_URL (WebSocket URL)
+#    - VITE_BACKEND_URL (API URL)
+# 3. Connect your GitHub repository
+# 4. Set build command to: npm run build
+# 5. Set publish directory to: dist
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_ENV = "production"
+  VITE_NODE_ENV = "production"
+
+# Redirect all requests to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# API proxy redirects (optional - if you want to proxy API calls)
+# IMPORTANT: Replace 'your-backend-domain.com' with your actual backend URL
+# Example: https://art-o-mart-api.netlify.app/api/:splat
+# Alternative: Configure environment variables via Netlify dashboard
+[[redirects]]
+  from = "/api/*"
+  to = "https://your-backend-domain.com/api/:splat"
+  status = 200
+  force = true
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-XSS-Protection = "1; mode=block"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# WebSocket proxy configuration for development (if needed)
+# This typically isn't needed for production as WebSockets go directly to backend
+# [[redirects]]
+#   from = "/ws/*"
+#   to = "wss://your-backend-domain.com/ws/:splat"
+#   status = 200
+
+# Form handling (if you have any forms that need server-side processing)
+# [[headers]]
+#   for = "/forms/*"
+#   [headers.values]
+#     X-Content-Type-Options = "nosniff"
+
+# Environment-specific builds
+[context.production]
+  command = "npm run build:prod"
+
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
+
+# Plugin configuration
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+  [plugins.inputs]
+    baseUrl = "https://your-domain.netlify.app"
+
+# Build optimization
+[build.processing]
+  skip_processing = false
+  
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true

@@ -65,6 +65,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
+              data-testid="ai-search-bar"
             >
               <AISearchBar onSearch={handleSearch} />
             </motion.div>
@@ -74,6 +75,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
+              data-testid="hero-carousel"
             >
               <HeroCarousel />
             </motion.div>
@@ -87,6 +89,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              data-testid="category-chips"
             >
               <CategoryChips 
                 onCategoryChange={handleCategoryChange}
@@ -103,6 +106,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              data-testid="product-grid"
             >
               <ProductGrid filters={filters} searchQuery={searchQuery} />
             </motion.div>
@@ -116,6 +120,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              data-testid="featured-artisans"
             >
               <FeaturedArtisans />
             </motion.div>
@@ -129,6 +134,7 @@ const MarketplaceHomepage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              data-testid="trust-indicators"
             >
               <TrustIndicators />
             </motion.div>

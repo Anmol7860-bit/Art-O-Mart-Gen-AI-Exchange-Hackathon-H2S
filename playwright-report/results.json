@@ -1,0 +1,704 @@
+{
+  "config": {
+    "configFile": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/playwright.config.js",
+    "rootDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/global-setup.js",
+    "globalTeardown": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/global-teardown.js",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "test-environment": "development",
+      "base-url": "http://localhost:4028",
+      "timestamp": "2025-09-20T19:24:18.748Z",
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "playwright-report/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "Microsoft Edge",
+        "name": "Microsoft Edge",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "test-environment": "development",
+          "base-url": "http://localhost:4028",
+          "timestamp": "2025-09-20T19:24:18.748Z",
+          "actualWorkers": 1
+        },
+        "id": "Google Chrome",
+        "name": "Google Chrome",
+        "testDir": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js$/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "port": 4028,
+      "timeout": 120000,
+      "reuseExistingServer": true
+    }
+  },
+  "suites": [
+    {
+      "title": "marketplace.spec.js",
+      "file": "marketplace.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Marketplace Browsing Tests",
+          "file": "marketplace.spec.js",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11518,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:24:24.071Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-3791185858ae7a70f927",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13536,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:24:36.647Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-firefox/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-b4e6f6259d3c6ef2107a",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11788,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:24:53.005Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-webkit/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-aff15d0d3cb3ff477928",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11762,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:25:06.185Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Chrome/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-2c52ac5e46cfd4744edc",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12090,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    13 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    13 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    13 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:25:18.834Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Mobile-Safari/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-cd09694e1549d5c86ec5",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Microsoft Edge",
+                  "projectName": "Microsoft Edge",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2,
+                      "error": {
+                        "message": "Error: browserType.launch: Chromium distribution 'msedge' is not found at /Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge\nRun \"npx playwright install msedge\"",
+                        "stack": "Error: browserType.launch: Chromium distribution 'msedge' is not found at /Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge\nRun \"npx playwright install msedge\""
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: browserType.launch: Chromium distribution 'msedge' is not found at /Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge\nRun \"npx playwright install msedge\""
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:25:32.259Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-681704fc374b14252d8b",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            },
+            {
+              "title": "Homepage loads with featured products and categories",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Google Chrome",
+                  "projectName": "Google Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 12029,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24",
+                        "location": {
+                          "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                          "column": 24,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                            "column": 24,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveTitle\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/Art-O-Mart.*Marketplace/\u001b[39m\nReceived string:  \u001b[31m\"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[39m\nTimeout: 10000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveTitle\" with timeout 10000ms\u001b[22m\n\u001b[2m    14 × unexpected value \"Art O Mart - Handcrafted Artisan Marketplace\"\u001b[22m\n\n\n\u001b[0m \u001b[90m  8 |\u001b[39m   test(\u001b[32m'Homepage loads with featured products and categories'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  9 |\u001b[39m     \u001b[90m// Check page title\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveTitle(\u001b[35m/Art-O-Mart.*Marketplace/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m     \n \u001b[90m 12 |\u001b[39m     \u001b[90m// Verify main sections are present\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid=\"hero-carousel\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js:10:24\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-20T19:25:32.781Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/test-results/marketplace-Marketplace-Br-b7dc6-red-products-and-categories-Google-Chrome/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/ANMOL BHANDARE/PROJECTS/artomart2/Art-O-Mart-Gen-AI-Exchange-Hackathon-H2S/tests/e2e/marketplace.spec.js",
+                        "column": 24,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "cc415ff31d677d2e2635-ea7c3bd1c57c835ab6f2",
+              "file": "marketplace.spec.js",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-20T19:24:18.754Z",
+    "duration": 87497.892,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 7,
+    "flaky": 0
+  }
+}

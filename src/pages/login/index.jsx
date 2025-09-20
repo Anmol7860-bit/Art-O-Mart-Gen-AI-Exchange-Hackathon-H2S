@@ -160,6 +160,7 @@ const Login = () => {
               placeholder="Enter your email address"
               error={errors?.email}
               disabled={isSubmitting}
+              data-testid="email-input"
             />
 
             <Input
@@ -171,6 +172,7 @@ const Login = () => {
               placeholder="Enter your password"
               error={errors?.password}
               disabled={isSubmitting}
+              data-testid="password-input"
             />
           </div>
 
@@ -196,6 +198,7 @@ const Login = () => {
             fullWidth
             loading={isSubmitting}
             disabled={isSubmitting}
+            data-testid="login-button"
           >
             {isSubmitting ? 'Signing In...' : 'Sign In'}
           </Button>
@@ -205,6 +208,7 @@ const Login = () => {
             <Link
               to="/signup"
               className="text-primary hover:text-primary/80 font-medium"
+              data-testid="sign-up-link"
             >
               Sign up
             </Link>

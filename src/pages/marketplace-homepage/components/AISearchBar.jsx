@@ -8,6 +8,8 @@ const AISearchBar = ({ onSearch }) => {
   const [isListening, setIsListening] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
   const inputRef = useRef(null);
 
   const aiSuggestions = [
@@ -70,11 +72,23 @@ const AISearchBar = ({ onSearch }) => {
     }
   }, [query]);
 
-  const handleSearch = (searchQuery = query) => {
+  const handleSearch = async (searchQuery = query) => {
     if (searchQuery?.trim()) {
-      onSearch?.(searchQuery?.trim());
+      setIsSearching(true);
+      setSearchResults(null);
       setShowSuggestions(false);
       inputRef?.current?.blur();
+      
+      // Simulate AI processing delay
+      setTimeout(() => {
+        setIsSearching(false);
+        setSearchResults({
+          suggestion: `Based on your query "${searchQuery}", I recommend handwoven textiles with traditional patterns, perfect for wedding gifts.`,
+          products: ['Traditional Handwoven Scarf', 'Wedding Ceremony Textile', 'Artisan Silk Fabric']
+        });
+      }, 2000);
+      
+      onSearch?.(searchQuery?.trim());
     }
   };
 
@@ -143,6 +157,7 @@ const AISearchBar = ({ onSearch }) => {
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           placeholder="Ask AI: 'Find handwoven textiles from Rajasthan' or 'Show pottery under ₹3000'"
           className="w-full h-14 pl-12 pr-32 bg-background border-2 border-border rounded-2xl text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none transition-colors duration-200 shadow-warm-sm"
+          data-testid="ai-search-input"
         />
 
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
@@ -164,6 +179,7 @@ const AISearchBar = ({ onSearch }) => {
             onClick={() => handleSearch()}
             disabled={!query?.trim()}
             className="h-10"
+            data-testid="ai-search-button"
           >
             Search
           </Button>
@@ -239,6 +255,41 @@ const AISearchBar = ({ onSearch }) => {
             <div className="w-3 h-3 bg-accent rounded-full animate-pulse" />
             <span className="text-sm font-medium text-accent">Listening... Speak now</span>
             <div className="w-3 h-3 bg-accent rounded-full animate-pulse" />
+          </div>
+        </div>
+      )}
+      
+      {/* AI Search Loading */}
+      {isSearching && (
+        <div className="absolute top-full left-0 right-0 mt-2 p-6 bg-background border border-border rounded-xl shadow-warm-lg" data-testid="ai-search-loading">
+          <div className="flex items-center justify-center space-x-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent"></div>
+            <span className="text-sm font-medium text-foreground">AI is analyzing your request...</span>
+          </div>
+        </div>
+      )}
+
+      {/* AI Search Results */}
+      {searchResults && !isSearching && (
+        <div className="absolute top-full left-0 right-0 mt-2 p-6 bg-background border border-border rounded-xl shadow-warm-lg" data-testid="ai-search-results">
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <Icon name="Sparkles" size={20} className="text-primary mt-0.5" />
+              <div className="flex-1">
+                <h4 className="font-medium text-foreground mb-2">AI Suggestion</h4>
+                <p className="text-sm text-muted-foreground" data-testid="ai-suggestion-text">
+                  {searchResults.suggestion}
+                </p>
+              </div>
+            </div>
+            <div className="border-t border-border pt-4">
+              <h5 className="text-sm font-medium text-foreground mb-2">Recommended Products:</h5>
+              <div className="space-y-2">
+                {searchResults.products.map((product, index) => (
+                  <div key={index} className="text-sm text-muted-foreground">• {product}</div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

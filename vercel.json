@@ -1,0 +1,87 @@
+{
+  "_comment": "Art-O-Mart Frontend Vercel Configuration",
+  "_setup": [
+    "1. Update backend URL in the redirects section below",
+    "2. Set environment variables in Vercel dashboard:",
+    "   - VITE_SUPABASE_URL",
+    "   - VITE_SUPABASE_ANON_KEY", 
+    "   - VITE_WS_URL (WebSocket URL)",
+    "   - VITE_BACKEND_URL (API URL)",
+    "3. Connect your GitHub repository",
+    "4. Deploy with: vercel --prod"
+  ],
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev -- --port $PORT",
+  "installCommand": "npm ci",
+  "routes": [
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "X-XSS-Protection": "1; mode=block"
+      }
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/pages/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "redirects": [
+    {
+      "_comment": "IMPORTANT: Replace 'your-backend-domain.com' with your actual backend URL",
+      "_example": "https://art-o-mart-api.vercel.app/api/:path*",
+      "_note": "This redirect proxies API calls from frontend to backend. Configure in Vercel dashboard or update before deployment.",
+      "source": "/api/:path*",
+      "destination": "https://your-backend-domain.com/api/:path*",
+      "permanent": false
+    }
+  ]
+}
