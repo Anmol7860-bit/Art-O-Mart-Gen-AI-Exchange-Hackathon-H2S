@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from './config/database.js';
 import agentManager from './api/agentManager.js';
 import WebSocketManager from './api/websocket.js';
+import { initializeEnvironment } from './utils/envValidator.js';
 
 // Import routers
 import aiRouter from './api/ai.routes.js';
@@ -17,6 +18,9 @@ import { authenticate } from './api/middleware.js';
 
 // Load environment variables
 dotenv.config();
+
+// Initialize and validate environment before starting server
+const envVars = initializeEnvironment();
 
 // Create Express app and HTTP server
 const app = express();
@@ -28,7 +32,7 @@ const wsManager = new WebSocketManager(httpServer);
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4028',
+  origin: envVars.FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
@@ -38,8 +42,8 @@ app.use(morgan('combined'));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
+  windowMs: parseInt(envVars.RATE_LIMIT_WINDOW_MS),
+  max: parseInt(envVars.RATE_LIMIT_MAX),
   message: 'Too many requests from this IP, please try again later.'
 });
 
@@ -101,13 +105,21 @@ const initializeAgents = async () => {
   }
 };
 
-// Start server
-const PORT = process.env.PORT || 5000;
+// Start server with validated environment variables
+const PORT = parseInt(envVars.PORT) || 5000;
 httpServer.listen(PORT, async () => {
-  console.log(`🚀 AI Backend Server running on port ${PORT}`);
+  console.log('🎉 Art-O-Mart Backend Server Started Successfully!');
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 WebSocket server ready for connections`);
-  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:4028'}`);
+  console.log(`🔗 Frontend URL: ${envVars.FRONTEND_URL}`);
+  console.log(`🤖 AI Model: ${envVars.AI_MODEL}`);
+  console.log(`🔐 JWT Expiry: ${envVars.JWT_EXPIRY}`);
+  console.log(`📊 Rate Limit: ${envVars.RATE_LIMIT_MAX} requests per ${Math.floor(envVars.RATE_LIMIT_WINDOW_MS / 60000)} minutes`);
+  
+  // Initialize agents after server starts
+  console.log('🔄 Initializing AI agents...');
   await initializeAgents();
+  console.log('✅ All systems operational!');
 });
 
 // Handle graceful shutdown
