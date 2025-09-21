@@ -1,0 +1,21 @@
+
+> art-o-mart@0.1.0 build
+> vite build --sourcemap
+
+vite v5.0.0 building for production...
+transforming...
+✓ 3084 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                    1.79 kB │ gzip:   0.75 kB
+dist/assets/css/page-marketplace-BcPDorgN.css      0.73 kB │ gzip:   0.38 kB
+dist/assets/css/index-DMP1hUSd.css                43.29 kB │ gzip:   8.08 kB
+dist/assets/js/vendor-ui-DkhsNs2B.js               0.46 kB │ gzip:   0.31 kB │ map:     1.16 kB
+dist/assets/js/page-ai-assistant-B4mVBmqg.js      35.54 kB │ gzip:  10.48 kB │ map:   107.05 kB
+dist/assets/js/page-auth-Bs13xqaV.js              38.43 kB │ gzip:   9.92 kB │ map:    98.49 kB
+dist/assets/js/vendor-ws-TjCxX7sJ.js              41.32 kB │ gzip:  12.96 kB │ map:   184.94 kB
+dist/assets/js/vendor-auth-2AeNS7zy.js           123.89 kB │ gzip:  34.10 kB │ map:   520.89 kB
+dist/assets/js/vendor-react-CgEFQqmk.js          314.21 kB │ gzip:  96.65 kB │ map: 1,624.29 kB
+dist/assets/js/index-DI2J3Z8e.js                 804.17 kB │ gzip: 227.64 kB │ map: 3,446.75 kB
+dist/assets/js/page-marketplace-CiaPrn8W.js    1,039.03 kB │ gzip: 222.23 kB │ map: 3,126.47 kB
+✓ built in 19.66s

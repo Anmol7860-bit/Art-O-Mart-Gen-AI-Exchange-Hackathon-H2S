@@ -8,6 +8,7 @@ import ChatInput from './components/ChatInput';
 import ConversationSidebar from './components/ConversationSidebar';
 import WelcomeScreen from './components/WelcomeScreen';
 import ChatProvider, { useChat } from './components/ChatProvider';
+import { WebSocketProvider } from './components/WebSocketManager';
 import { useAuth } from '../../contexts/AuthContext';
 
 const AIShoppingAssistantContent = () => {
@@ -205,9 +206,11 @@ const AIShoppingAssistantContent = () => {
 };
 
 const AIShoppingAssistant = () => (
-  <ChatProvider>
-    <AIShoppingAssistantContent />
-  </ChatProvider>
+  <WebSocketProvider>
+    <ChatProvider>
+      <AIShoppingAssistantContent />
+    </ChatProvider>
+  </WebSocketProvider>
 );
 
 export default AIShoppingAssistant;
