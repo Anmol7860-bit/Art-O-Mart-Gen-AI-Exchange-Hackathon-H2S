@@ -94,7 +94,9 @@ class MonitoringService {
       replaysOnErrorSampleRate: 1.0,
 
       // Release tracking
-      release: import.meta.env.VITE_APP_VERSION || __APP_VERSION__ || '1.0.0',
+      release: import.meta.env.VITE_APP_VERSION || 
+               (typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : null) || 
+               '1.0.0',
 
       // User context
       beforeSend: (event) => {

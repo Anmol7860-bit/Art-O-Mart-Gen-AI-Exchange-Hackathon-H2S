@@ -155,6 +155,13 @@ async function runCartTests(baseUrl) {
   };
   
   try {
+    const cartTestFile = path.join(projectRoot, 'tests/e2e/cart.spec.js');
+    if (!fs.existsSync(cartTestFile)) {
+      warning('cart.spec.js not found, skipping cart tests');
+      testResults.skipped = 1;
+      return testResults;
+    }
+    
     executeCommand(`npx playwright test tests/e2e/cart.spec.js`, {
       env: { 
         ...process.env, 
