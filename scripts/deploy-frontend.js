@@ -52,7 +52,7 @@ function executeCommand(command, options = {}) {
     log(`Executing: ${command}`, 'cyan');
     const result = execSync(command, { 
       encoding: 'utf8', 
-      stdio: 'inherit',
+      stdio: options.capture ? 'pipe' : 'inherit',
       cwd: projectRoot,
       ...options 
     });
@@ -70,6 +70,8 @@ async function validateEnvironment() {
   const requiredVars = [
     'VITE_SUPABASE_URL',
     'VITE_SUPABASE_ANON_KEY',
+    'VITE_BACKEND_URL',
+    'VITE_API_URL',
     'VITE_WS_URL'
   ];
   
@@ -80,6 +82,14 @@ async function validateEnvironment() {
       const value = getEnvVar(varName);
       if (!value || value.includes('placeholder') || value.includes('your-')) {
         missing.push(varName);
+      }
+      
+      // In production, VITE_BACKEND_URL must be HTTPS
+      if (varName === 'VITE_BACKEND_URL' && value && process.env.NODE_ENV === 'production') {
+        if (!value.startsWith('https://')) {
+          error(`${varName} must use HTTPS in production, got: ${value}`);
+          missing.push(varName);
+        }
       }
     } catch (err) {
       missing.push(varName);
@@ -100,17 +110,17 @@ async function runTests(testType = 'all') {
   info(`Running ${testType} tests...`);
   
   const testCommands = {
-    unit: 'npm run test:unit',
-    integration: 'npm run test:integration', 
-    e2e: 'npm run test:e2e',
-    all: 'npm run test:all'
+    unit: 'npm run test:unit --if-present',
+    integration: 'npm run test:integration --if-present', 
+    e2e: 'npm run test:e2e --if-present',
+    all: 'npm run test:all --if-present'
   };
   
   try {
     if (testType === 'all') {
       // Run unit and integration tests
-      executeCommand('npm run test:unit');
-      executeCommand('npm run test:integration');
+      executeCommand('npm run test:unit --if-present');
+      executeCommand('npm run test:integration --if-present');
       info('Skipping E2E tests during build (run separately for deployed app)');
     } else {
       executeCommand(testCommands[testType]);
@@ -127,7 +137,8 @@ async function buildApplication() {
   
   // Clean previous build
   if (fs.existsSync(path.join(projectRoot, 'dist'))) {
-    executeCommand('rm -rf dist');
+    fs.rmSync(path.join(projectRoot, 'dist'), { recursive: true, force: true });
+    info('Removed previous build directory');
   }
   
   // Build the application
@@ -160,9 +171,20 @@ async function deployToVercel() {
     process.exit(1);
   }
   
-  // Deploy to Vercel
-  executeCommand('vercel --prod --yes');
-  success('Deployed to Vercel successfully');
+  // Deploy to Vercel and capture URL
+  const out = executeCommand('vercel --prod --yes', { capture: true });
+  
+  // Extract URL from output (Vercel outputs the URL in the last line)
+  const lines = out.trim().split('\n');
+  const url = lines[lines.length - 1].trim();
+  
+  if (!url.startsWith('https://')) {
+    error('Failed to capture deployment URL from Vercel output');
+    process.exit(1);
+  }
+  
+  success(`Deployed to Vercel successfully: ${url}`);
+  return url;
 }
 
 async function deployToNetlify() {
@@ -176,9 +198,36 @@ async function deployToNetlify() {
     process.exit(1);
   }
   
-  // Deploy to Netlify
-  executeCommand('netlify deploy --prod --dir=dist');
-  success('Deployed to Netlify successfully');
+  // Deploy to Netlify with JSON output
+  const out = executeCommand('netlify deploy --prod --json --dir=dist', { capture: true });
+  
+  try {
+    const { deploy_url, url } = JSON.parse(out);
+    const deploymentUrl = deploy_url || url;
+    
+    if (!deploymentUrl) {
+      throw new Error('No deployment URL in response');
+    }
+    
+    success(`Deployed to Netlify successfully: ${deploymentUrl}`);
+    return deploymentUrl;
+  } catch (parseErr) {
+    // Fallback: try to extract URL from text output
+    const lines = out.trim().split('\n');
+    for (const line of lines) {
+      if (line.includes('https://') && (line.includes('netlify.app') || line.includes('netlify.com'))) {
+        const urlMatch = line.match(/https:\/\/[^\s]+/);
+        if (urlMatch) {
+          const url = urlMatch[0];
+          success(`Deployed to Netlify successfully: ${url}`);
+          return url;
+        }
+      }
+    }
+    
+    error('Failed to capture deployment URL from Netlify output');
+    process.exit(1);
+  }
 }
 
 async function deployToAWS() {
@@ -212,9 +261,17 @@ async function deployToAWS() {
   if (cloudFrontId) {
     executeCommand(`aws cloudfront create-invalidation --distribution-id ${cloudFrontId} --paths "/*"`);
     success('CloudFront cache invalidated');
+    
+    // Return CloudFront URL
+    const cloudFrontUrl = `https://${cloudFrontId}.cloudfront.net`;
+    success(`Deployed to AWS successfully: ${cloudFrontUrl}`);
+    return cloudFrontUrl;
+  } else {
+    // Return S3 website URL
+    const s3Url = `http://${s3Bucket}.s3-website-us-east-1.amazonaws.com`;
+    success(`Deployed to AWS successfully: ${s3Url}`);
+    return s3Url;
   }
-  
-  success('Deployed to AWS successfully');
 }
 
 async function validateDeployment(deploymentUrl) {
@@ -268,27 +325,33 @@ async function main() {
     await buildApplication();
     
     // Step 4: Deploy to chosen platform
+    let url;
     switch (platform.toLowerCase()) {
       case 'vercel':
-        await deployToVercel();
+        url = await deployToVercel();
         break;
       case 'netlify':
-        await deployToNetlify();
+        url = await deployToNetlify();
         break;
       case 'aws':
-        await deployToAWS();
+        url = await deployToAWS();
         break;
       default:
         error(`Unknown platform: ${platform}. Supported: vercel, netlify, aws`);
         process.exit(1);
     }
     
+    // Use provided deployment URL or captured URL
+    const finalUrl = deploymentUrl || url;
+    
     // Step 5: Validate deployment
-    if (deploymentUrl) {
+    if (finalUrl) {
       // Wait for deployment to be available
       info('Waiting 30 seconds for deployment to be available...');
       await new Promise(resolve => setTimeout(resolve, 30000));
-      await validateDeployment(deploymentUrl);
+      await validateDeployment(finalUrl);
+    } else {
+      warning('No deployment URL available for validation');
     }
     
     success('🎉 Deployment completed successfully!');

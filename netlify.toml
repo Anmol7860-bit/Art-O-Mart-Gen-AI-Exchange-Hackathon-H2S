@@ -25,15 +25,15 @@
   to = "/index.html"
   status = 200
 
-# API proxy redirects (optional - if you want to proxy API calls)
-# IMPORTANT: Replace 'your-backend-domain.com' with your actual backend URL
-# Example: https://art-o-mart-api.netlify.app/api/:splat
+# API proxy redirects (DISABLED - Update with real backend URL when available)
+# IMPORTANT: Uncomment and replace with your actual backend URL when ready
+# Example: https://art-o-mart-backend-prod.railway.app/api/:splat
 # Alternative: Configure environment variables via Netlify dashboard
-[[redirects]]
-  from = "/api/*"
-  to = "https://your-backend-domain.com/api/:splat"
-  status = 200
-  force = true
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://your-backend-domain-here.railway.app/api/:splat"
+#   status = 200
+#   force = true
 
 # Security headers
 [[headers]]
@@ -104,7 +104,7 @@
 [[plugins]]
   package = "@netlify/plugin-sitemap"
   [plugins.inputs]
-    baseUrl = "https://your-domain.netlify.app"
+    baseUrl = "https://art-o-mart.netlify.app"
 
 # Build optimization
 [build.processing]

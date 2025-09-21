@@ -173,8 +173,44 @@ After frontend deployment:
 - **Render**: https://render.com/docs
 - **Fly.io**: https://fly.io/docs/
 
+## WebSocket Configuration & Status
+
+### WebSocket Feature Implementation ✅ **COMPLETED**
+**Implementation Date**: 2025-09-21  
+**Status**: ✅ **FUNCTIONAL**
+
+#### Configuration Status
+- ✅ **WebSocketManager Import**: Fixed ReferenceError by uncommenting import in `backend/server.js`
+- ✅ **Class Structure Verified**: `backend/api/websocket.js` exports correct WebSocketManager class
+  - Constructor: `(httpServer, agentManager)` ✅
+  - Method: `broadcast(channel, event, data)` ✅
+  - Method: `closeAllConnections()` ✅
+- ✅ **Feature Flag Logic**: WebSocket initialization properly gated by `ENABLE_WEBSOCKETS === 'true'`
+- ✅ **Environment Variables**: 
+  - `ENABLE_WEBSOCKETS=true` in `.env.production` ✅
+  - `ENABLE_WEBSOCKETS=true` in `render.yaml` ✅  
+  - `ENABLE_WEBSOCKETS=true` in `fly.toml` ✅
+
+#### Testing Results
+- ✅ **Local Testing**: Server starts successfully with `ENABLE_WEBSOCKETS=true`
+- ✅ **No ReferenceError**: WebSocketManager import and instantiation works correctly
+- ✅ **Socket.IO Integration**: WebSocket server ready for connections on all platforms
+- ✅ **Graceful Shutdown**: WebSocket connections properly closed during server shutdown
+
+#### Production Configuration Notes
+- **Port**: WebSocket connections use same port as HTTP server (5000 for production)
+- **CORS**: Configured to allow frontend domains via `getAllowedOrigins()`
+- **Authentication**: JWT token-based authentication for WebSocket connections
+- **Event Types**: Supports AGENT, AI, and SYSTEM event channels
+- **Heartbeat**: 30-second interval with 60-second timeout for connection health
+
+#### Known Issues & Dependencies
+- ⚠️ **Agent Manager Dependency**: WebSocket events depend on agent system initialization
+- ⚠️ **AI Features Flag**: Full functionality requires `ENABLE_AI_FEATURES=true` for agent events
+- ✅ **Syntax Fixed**: Resolved duplicate method definitions in websocket.js
+
 ---
 
-**Last Updated**: [TO BE FILLED]  
+**Last Updated**: 2025-09-21  
 **Next Review Date**: [TO BE SCHEDULED]  
 **Status**: 🚧 In Progress

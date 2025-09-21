@@ -146,12 +146,17 @@ async function validateAPIConnectivity(deploymentUrl) {
   
   for (const [name, endpoint] of Object.entries(apiEndpoints)) {
     try {
-      // Try to get backend URL from environment or derive from deployment URL
-      let backendUrl = process.env.VITE_BACKEND_URL;
+      // Use VITE_BACKEND_URL from environment - should be loaded by deploy script
+      const backendUrl = process.env.VITE_BACKEND_URL;
+      
       if (!backendUrl) {
-        backendUrl = deploymentUrl.replace(/^https?:\/\//, '').includes('localhost') 
-          ? 'http://localhost:5000' 
-          : deploymentUrl.replace('frontend', 'backend'); // Adjust as needed
+        warning(`API ${name}: No VITE_BACKEND_URL configured, skipping backend validation`);
+        continue;
+      }
+      
+      if (backendUrl.includes('your-backend-domain-here') || backendUrl.includes('placeholder')) {
+        warning(`API ${name}: Backend URL contains placeholder value, skipping`);
+        continue;
       }
       
       const url = `${backendUrl}${endpoint}`;
@@ -177,17 +182,40 @@ async function validateAPIConnectivity(deploymentUrl) {
   return results;
 }
 
-async function validateWebSocketConnection(deploymentUrl) {
+async function validateWebSocketConnection(deploymentUrl, cliArgs = {}) {
   info('Validating WebSocket connectivity...');
   
   try {
-    // Get WebSocket URL from environment or derive from deployment URL
-    let wsUrl = process.env.VITE_WS_URL;
+    // Prefer CLI argument, then environment variable
+    let wsUrl = cliArgs.wsUrl || process.env.VITE_WS_URL;
+    
+    // If --backendUrl is provided but --wsUrl is not, construct WS URL
+    if (!wsUrl && cliArgs.backendUrl) {
+      wsUrl = cliArgs.backendUrl.replace('http://', 'ws://').replace('https://', 'wss://');
+    }
+    
+    // If no explicit configuration, skip with warning
     if (!wsUrl) {
-      wsUrl = deploymentUrl.replace('http://', 'ws://').replace('https://', 'wss://');
-      if (!wsUrl.includes('localhost')) {
-        wsUrl = wsUrl.replace('frontend', 'backend'); // Adjust as needed
-      }
+      warning('No VITE_WS_URL or --wsUrl provided; skipping WebSocket validation');
+      return {
+        skipped: true,
+        reason: 'No WebSocket URL configured',
+        note: 'Provide VITE_WS_URL environment variable or --wsUrl argument to validate'
+      };
+    }
+    
+    // Validate that production uses secure WebSocket
+    if (wsUrl.startsWith('ws://') && !wsUrl.includes('localhost')) {
+      warning('WebSocket URL uses insecure protocol (ws://) in production; consider wss://');
+    }
+    
+    if (wsUrl.includes('placeholder') || wsUrl.includes('your-backend-domain-here')) {
+      warning('WebSocket URL contains placeholder value, skipping validation');
+      return {
+        configured: false,
+        wsUrl,
+        issue: 'Placeholder URL detected'
+      };
     }
     
     // Note: We can't easily test WebSocket connections in Node.js without socket.io-client
@@ -197,6 +225,7 @@ async function validateWebSocketConnection(deploymentUrl) {
     return {
       wsUrl,
       configured: true,
+      secure: wsUrl.startsWith('wss://'),
       note: 'WebSocket functionality should be tested with E2E tests'
     };
   } catch (err) {
@@ -376,14 +405,23 @@ function generateValidationReport(validationResults, deploymentUrl) {
 async function main() {
   const args = process.argv.slice(2);
   const deploymentUrl = args.find(arg => arg.startsWith('--url='))?.split('=')[1];
+  const wsUrl = args.find(arg => arg.startsWith('--wsUrl='))?.split('=')[1];
+  const backendUrl = args.find(arg => arg.startsWith('--backendUrl='))?.split('=')[1];
   
   if (!deploymentUrl) {
     error('Deployment URL is required. Use --url=https://your-domain.com');
+    info('Optional parameters:');
+    info('  --wsUrl=wss://your-websocket-url.com    Override WebSocket URL');
+    info('  --backendUrl=https://your-backend.com   Use to derive WebSocket URL if --wsUrl not provided');
     process.exit(1);
   }
   
+  const cliArgs = { wsUrl, backendUrl };
+  
   log('🔍 Starting Deployment Validation', 'magenta');
   log(`Target URL: ${deploymentUrl}`, 'cyan');
+  if (wsUrl) log(`WebSocket URL: ${wsUrl}`, 'cyan');
+  if (backendUrl) log(`Backend URL: ${backendUrl}`, 'cyan');
   
   const validationResults = {};
   
@@ -392,7 +430,7 @@ async function main() {
     validationResults.connectivity = await validateBasicConnectivity(deploymentUrl);
     validationResults.assets = await validateStaticAssets(deploymentUrl);
     validationResults.api = await validateAPIConnectivity(deploymentUrl);
-    validationResults.websocket = await validateWebSocketConnection(deploymentUrl);
+    validationResults.websocket = await validateWebSocketConnection(deploymentUrl, cliArgs);
     validationResults.environment = await validateEnvironmentConfiguration();
     validationResults.performance = await performanceCheck(deploymentUrl);
     
