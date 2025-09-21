@@ -1,0 +1,8 @@
+{
+  "name": "art-o-mart-api",
+  "version": "1.0.0",
+  "description": "API functions for Art-O-Mart with Gemini 2.0 Flash integration",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}

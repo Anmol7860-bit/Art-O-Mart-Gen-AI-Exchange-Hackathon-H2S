@@ -7,25 +7,21 @@ import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import ConversationSidebar from './components/ConversationSidebar';
 import WelcomeScreen from './components/WelcomeScreen';
-import AgentManager from './components/AgentManager';
-import WebSocketProvider, { useWebSocket } from './components/WebSocketManager';
-import TaskProgress from './components/TaskProgress';
+import ChatProvider, { useChat } from './components/ChatProvider';
 import { useAuth } from '../../contexts/AuthContext';
-import { chatService } from '../../services/chatService';
 
 const AIShoppingAssistantContent = () => {
   const navigate = useNavigate();
   const { session } = useAuth();
-  const { isConnected, subscribe, emit } = useWebSocket();
+  const { isConnected, connectionError, sendMessage } = useChat();
   const messagesEndRef = useRef(null);
 
   const [conversationHistory, setConversationHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [selectedAgent, setSelectedAgent] = useState('productRecommendation');
   const [currentTask, setCurrentTask] = useState(null);
-  const [selectedAgent, setSelectedAgent] = useState(null);
-  
   const [userPreferences, setUserPreferences] = useState({
     budgetMin: 500,
     budgetMax: 10000,
@@ -42,125 +38,84 @@ const AIShoppingAssistantContent = () => {
     messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    if (!isConnected) return;
-
-    // Subscribe to AI responses - handle both camelCase and underscore formats
-    const unsubscribeResponse = subscribe('ai-response', (data) => {
-      setConversationHistory(prev => [...prev, {
-        id: Date.now(),
-        sender: 'ai',
-        agentType: data.agent_type || data.agentType, // Support both formats
-        timestamp: new Date(),
-        text: data.message,
-        products: data.products || [],
-        culturalInsight: data.culturalInsight
-      }]);
-      setIsLoading(false);
-      setCurrentTask(null);
-    });
-
-    // Subscribe to task progress
-    const unsubscribeProgress = subscribe('agent-task-progress', (data) => {
-      setCurrentTask(prev => ({
-        ...prev,
-        ...data,
-        status: 'in-progress'
-      }));
-    });
-
-    // Subscribe to task completion
-    const unsubscribeComplete = subscribe('agent-task-complete', (data) => {
-      setCurrentTask(prev => ({
-        ...prev,
-        ...data,
-        status: 'completed'
-      }));
-    });
-
-    // Subscribe to errors
-    const unsubscribeError = subscribe('agent-error', (data) => {
-      setCurrentTask(prev => ({
-        ...prev,
-        status: 'error',
-        error: data.error
-      }));
-      setIsLoading(false);
-    });
-
-    return () => {
-      unsubscribeResponse();
-      unsubscribeProgress();
-      unsubscribeComplete();
-      unsubscribeError();
-    };
-  }, [isConnected, subscribe]);
-
-  const handleSendMessage = async (message) => {
-    if (!selectedAgent) {
-      console.error('No agent selected');
-      return;
-    }
+  const handleSendMessage = async (message, selectedAgentType = null) => {
+    const agentType = selectedAgentType || selectedAgent || 'productRecommendation';
+    const userId = session?.user?.id || 'anonymous';
 
     // Add user message to conversation
-    setConversationHistory(prev => [...prev, {
+    const userMessage = {
       id: Date.now(),
       sender: 'user',
-      text: message,
-      timestamp: new Date()
-    }]);
+      timestamp: new Date(),
+      text: message
+    };
 
+    setConversationHistory(prev => [...prev, userMessage]);
     setIsLoading(true);
     setShowWelcome(false);
 
+    // Simulate task progress for better UX
+    setCurrentTask({
+      id: `task_${Date.now()}`,
+      name: `${agentType === 'productRecommendation' ? 'Finding products' : 'Processing request'}`,
+      status: 'in-progress',
+      progress: 25
+    });
+
     try {
-      // Send message using chat service
-      const response = await chatService.sendMessage(message, selectedAgent);
+      // Send message to Gemini-powered API
+      const response = await sendMessage(message, agentType, userId);
       
-      if (response.success) {
-        // Add AI response to conversation
-        setConversationHistory(prev => [...prev, {
-          id: Date.now() + 1,
-          sender: 'ai',
-          text: response.response,
-          timestamp: new Date(),
-          agent: response.agent
-        }]);
-      } else {
-        // Add error message
-        setConversationHistory(prev => [...prev, {
-          id: Date.now() + 1,
-          sender: 'ai',
-          text: 'Sorry, I encountered an error processing your request. Please try again.',
-          timestamp: new Date(),
-          isError: true
-        }]);
-      }
-    } catch (error) {
-      console.error('Chat error:', error);
-      setConversationHistory(prev => [...prev, {
+      // Add AI response to conversation
+      const aiMessage = {
         id: Date.now() + 1,
         sender: 'ai',
-        text: 'I apologize, but I\'m having trouble responding right now. Please try again in a moment.',
+        agentType: response.agentType,
+        timestamp: new Date(response.timestamp),
+        text: response.response,
+        products: response.products || [],
+        culturalInsight: response.culturalInsight,
+        suggestions: response.suggestions || [],
+        metadata: response.metadata
+      };
+
+      setConversationHistory(prev => [...prev, aiMessage]);
+      
+      // Complete the task
+      setCurrentTask({
+        id: `task_${Date.now()}`,
+        name: 'Complete',
+        status: 'completed',
+        progress: 100
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Add error message
+      const errorMessage = {
+        id: Date.now() + 1,
+        sender: 'ai',
+        agentType: 'customerSupport',
         timestamp: new Date(),
-        isError: true
-      }]);
+        text: "I'm sorry, I encountered an issue processing your request. Please try again.",
+        error: true
+      };
+
+      setConversationHistory(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setTimeout(() => setCurrentTask(null), 2000); // Clear task after 2 seconds
     }
   };
 
   const handleCancelTask = () => {
-    if (currentTask?.taskId) {
-      emit('cancel-task', {
-        task_id: currentTask.taskId,
-        agent_type: currentTask.agent_type || currentTask.agentType // Support both formats for now
-      });
-    }
+    setCurrentTask(null);
+    setIsLoading(false);
   };
 
   const handleRetryTask = () => {
-    if (currentTask?.taskId && currentTask?.message) {
+    if (currentTask?.message) {
       handleSendMessage(currentTask.message);
     }
   };
@@ -173,9 +128,7 @@ const AIShoppingAssistantContent = () => {
         history={conversationHistory}
         preferences={userPreferences}
         onPreferencesChange={setUserPreferences}
-      >
-        <AgentManager />
-      </ConversationSidebar>
+      />
 
       <div className="flex-1 flex flex-col">
         <Header className="px-4">
@@ -187,7 +140,20 @@ const AIShoppingAssistantContent = () => {
             >
               <AppIcon name="menu" className="w-6 h-6" />
             </Button>
-            <h1 className="text-xl font-semibold">AI Shopping Assistant</h1>
+
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-600">
+                {isConnected ? (
+                  <span className="text-green-600">Connected</span>
+                ) : (
+                  <span className="text-red-600">
+                    {connectionError || 'Disconnected'}
+                  </span>
+                )}
+              </div>
+              <h1 className="text-lg font-semibold">AI Shopping Assistant</h1>
+            </div>
+
             <Button
               variant="ghost"
               size="icon"
@@ -206,30 +172,31 @@ const AIShoppingAssistantContent = () => {
               {conversationHistory.map((message) => (
                 <ChatMessage
                   key={message.id}
-                  {...message}
-                  className="max-w-3xl mx-auto"
+                  message={message}
+                  onAgentSelect={(agentType) => {
+                    setSelectedAgent(agentType);
+                    if (message.text) {
+                      handleSendMessage(message.text, agentType);
+                    }
+                  }}
+                  preferences={userPreferences}
                 />
               ))}
-              {currentTask && (
-                <TaskProgress
-                  {...currentTask}
-                  onCancel={handleCancelTask}
-                  onRetry={currentTask.status === 'error' ? handleRetryTask : undefined}
-                  className="max-w-3xl mx-auto"
-                />
-              )}
-              <div ref={messagesEndRef} />
             </>
           )}
+          <div ref={messagesEndRef} />
         </div>
 
-        <div className="p-4 border-t">
+        <div className="border-t bg-gray-50 p-4">
           <ChatInput
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
             selectedAgent={selectedAgent}
-            onAgentSelect={setSelectedAgent}
-            className="max-w-3xl mx-auto"
+            onAgentChange={setSelectedAgent}
+            isConnected={isConnected}
+            currentTask={currentTask}
+            onCancelTask={handleCancelTask}
+            onRetryTask={handleRetryTask}
           />
         </div>
       </div>
@@ -238,9 +205,9 @@ const AIShoppingAssistantContent = () => {
 };
 
 const AIShoppingAssistant = () => (
-  <WebSocketProvider>
+  <ChatProvider>
     <AIShoppingAssistantContent />
-  </WebSocketProvider>
+  </ChatProvider>
 );
 
 export default AIShoppingAssistant;
