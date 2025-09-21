@@ -2,13 +2,26 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm ci",
-    "watchPatterns": ["backend/**"]
+    "buildCommand": "npm ci --only=production",
+    "watchPatterns": [
+      "**/*.js",
+      "**/*.json",
+      "package.json",
+      "package-lock.json",
+      "server.js",
+      "api/**",
+      "agents/**",
+      "config/**",
+      "middleware/**",
+      "services/**",
+      "utils/**"
+    ]
   },
   "deploy": {
-    "startCommand": "npm start",
+    "startCommand": "NODE_ENV=production npm start",
     "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 10,
-    "restartPolicyType": "ON_FAILURE"
+    "healthcheckTimeout": 30,
+    "restartPolicyType": "ON_FAILURE",
+    "numReplicas": 1
   }
 }

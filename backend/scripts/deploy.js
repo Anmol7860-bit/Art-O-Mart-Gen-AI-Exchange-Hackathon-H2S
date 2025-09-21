@@ -16,9 +16,8 @@ class DeploymentManager {
       'NODE_ENV',
       'PORT',
       'SUPABASE_URL',
-      'SUPABASE_ANON_KEY',
-      'SUPABASE_SERVICE_ROLE_KEY',
-      'GOOGLE_GEMINI_API_KEY',
+      'SUPABASE_SERVICE_KEY',
+      'GEMINI_API_KEY',
       'JWT_SECRET'
     ];
   }

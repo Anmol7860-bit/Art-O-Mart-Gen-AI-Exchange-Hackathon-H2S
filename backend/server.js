@@ -6,7 +6,7 @@ import { createServer } from 'http';
 import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from './config/database.js';
 import agentManager from './api/agentManager.js';
-// import WebSocketManager from './api/websocket.js';
+import WebSocketManager from './api/websocket.js';
 import { initializeEnvironment } from './utils/envValidator.js';
 import backendMonitoring from './middleware/monitoring.js';
 
@@ -37,7 +37,10 @@ const app = express();
 const httpServer = createServer(app);
 
 // Initialize WebSocket manager
-// const wsManager = new WebSocketManager(httpServer, agentManager);
+let wsManager;
+if (process.env.ENABLE_WEBSOCKETS === 'true') {
+  wsManager = new WebSocketManager(httpServer, agentManager);
+}
 
 // Trust proxy (important for accurate client IP detection)
 app.set('trust proxy', 1);
@@ -68,6 +71,7 @@ const limiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false,
+  skip: (req) => req.path.startsWith('/api/health'), // Skip rate limiting for health checks
   handler: (req, res) => {
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
@@ -81,13 +85,13 @@ const limiter = rateLimit({
   }
 });
 
+// Health check route (no auth required, no rate limiting)
+app.use('/api/health', healthRouter);
+
 app.use('/api/', limiter);
 
 // Metrics endpoint
 app.get('/metrics', backendMonitoring.metricsEndpoint());
-
-// Health check route (no auth required)
-app.use('/api/health', healthRouter);
 
 // API routes - authentication handled per route
 app.use('/api/ai', aiRouter);
@@ -171,26 +175,34 @@ app.use((req, res) => {
 const initializeAgents = async () => {
   try {
     logger.info('Starting agent system initialization...');
-    // Comment out agent initialization for now
-    // await agentManager.initializeAgents();
+    
+    if (process.env.ENABLE_AI_FEATURES === 'true') {
+      await agentManager.initializeAgents();
+    } else {
+      logger.info('AI features disabled, skipping agent initialization');
+    }
     
     // Broadcast agent system ready event
-    // wsManager.broadcast('system', 'system:agents_ready', {
-    //   message: 'Agent system initialized successfully',
-    //   timestamp: new Date().toISOString(),
-    //   agentCount: Object.keys(agentManager.getAllAgentsStatus()).length
-    // });
+    if (wsManager) {
+      wsManager.broadcast('system', 'system:agents_ready', {
+        message: 'Agent system initialized successfully',
+        timestamp: new Date().toISOString(),
+        agentCount: Object.keys(agentManager.getAllAgentsStatus()).length
+      });
+    }
     
     logger.info('Agent system initialized successfully');
   } catch (error) {
     logger.error('Failed to initialize agents', { error: error.message });
     
     // Broadcast error event
-    // wsManager.broadcast('system', 'system:error', {
-    //   type: 'agent_initialization_failed',
-    //   message: 'Failed to initialize agent system', 
-    //   timestamp: new Date().toISOString()
-    // });
+    if (wsManager) {
+      wsManager.broadcast('system', 'system:error', {
+        type: 'agent_initialization_failed',
+        message: 'Failed to initialize agent system', 
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 };
 
@@ -213,12 +225,14 @@ httpServer.listen(PORT, HOST, async () => {
   await initializeAgents();
   
   // Broadcast server ready event
-  // wsManager.broadcast('system', 'system:server_ready', {
-  //   message: 'Server started successfully',
-  //   timestamp: new Date().toISOString(),
-  //   port: PORT,
-  //   host: HOST
-  // });
+  if (wsManager) {
+    wsManager.broadcast('system', 'system:server_ready', {
+      message: 'Server started successfully',
+      timestamp: new Date().toISOString(),
+      port: PORT,
+      host: HOST
+    });
+  }
   
   logger.info('✅ All systems operational!');
 });
@@ -229,10 +243,12 @@ const shutdown = async (signal) => {
   
   try {
     // Broadcast shutdown event
-    // wsManager.broadcast('system', 'system:shutdown', {
-    //   message: 'Server shutting down',
-    //   timestamp: new Date().toISOString()
-    // });
+    if (wsManager) {
+      wsManager.broadcast('system', 'system:shutdown', {
+        message: 'Server shutting down',
+        timestamp: new Date().toISOString()
+      });
+    }
     
     // Stop accepting new connections
     httpServer.close(() => {
@@ -241,12 +257,15 @@ const shutdown = async (signal) => {
     
     // Stop all agents
     logger.info('Stopping AI agents...');
-    // Comment out agent shutdown for now
-    // await agentManager.stopAllAgents();
+    if (process.env.ENABLE_AI_FEATURES === 'true') {
+      await agentManager.stopAllAgents();
+    }
     logger.info('AI agents stopped');
     
     // Close WebSocket connections
-    // wsManager.closeAllConnections();
+    if (wsManager) {
+      wsManager.closeAllConnections();
+    }
     logger.info('WebSocket connections closed');
     
     // Close database connections (if applicable)

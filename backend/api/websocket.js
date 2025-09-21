@@ -205,43 +205,6 @@ class WebSocketManager {
       this.io.to(`agent:${type}`).emit('agent:error', {
         agentType: type,
         error,
-  /**
-   * Setup event listeners for agent events
-   */
-  setupAgentEventListeners() {
-    if (!this.agentManager) return;
-    
-    // Agent started event
-    this.agentManager.on('agent:started', ({ type, config }) => {
-      this.io.to(`agent:${type}`).emit('agent:started', {
-        agentType: type,
-        config,
-        timestamp: new Date().toISOString()
-      });
-      this.io.to('agents').emit('agent:started', {
-        agentType: type,
-        config,
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    // Agent stopped event
-    this.agentManager.on('agent:stopped', ({ type }) => {
-      this.io.to(`agent:${type}`).emit('agent:stopped', {
-        agentType: type,
-        timestamp: new Date().toISOString()
-      });
-      this.io.to('agents').emit('agent:stopped', {
-        agentType: type,
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    // Agent error event
-    this.agentManager.on('agent:error', ({ type, error }) => {
-      this.io.to(`agent:${type}`).emit('agent:error', {
-        agentType: type,
-        error,
         timestamp: new Date().toISOString()
       });
     });

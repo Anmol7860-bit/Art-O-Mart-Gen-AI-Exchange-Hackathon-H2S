@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: starter
     region: oregon
-    buildCommand: npm ci
-    startCommand: npm start
+    buildCommand: npm ci --only=production
+    startCommand: NODE_ENV=production npm start
     healthCheckPath: /api/health
     autoDeploy: true
     rootDir: backend
@@ -14,31 +14,58 @@ services:
         value: production
       - key: PORT
         value: 5000
-      - key: SUPABASE_URL
+      - key: GEMINI_API_KEY
         sync: false
-      - key: SUPABASE_ANON_KEY
+      - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
         sync: false
-      - key: GOOGLE_API_KEY
-        sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: FRONTEND_URL
+        value: https://your-frontend-domain.vercel.app
       - key: CORS_ORIGINS
-        value: https://your-frontend-domain.com
-      - key: RATE_LIMIT_WINDOW_MS
-        value: 900000
-      - key: RATE_LIMIT_MAX_REQUESTS
-        value: 100
+        value: https://your-frontend-domain.vercel.app,https://art-o-mart.vercel.app
+      - key: AI_MODEL
+        value: gemini-2.0-flash-001
+      - key: AI_TEMPERATURE
+        value: 0.7
+      - key: AI_MAX_TOKENS
+        value: 2000
+      - key: JWT_EXPIRY
+        value: 7d
       - key: LOG_LEVEL
         value: info
+      - key: RATE_LIMIT_MAX
+        value: 1000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 1000
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: ENABLE_WEBSOCKETS
+        value: true
+      - key: ENABLE_AI_FEATURES
+        value: true
+      - key: ENABLE_RATE_LIMITING
+        value: true
+      - key: ENABLE_REQUEST_LOGGING
+        value: true
     scaling:
       minInstances: 1
-      maxInstances: 3
+      maxInstances: 5
+      targetCPU: 70
+      targetMemory: 80
+    resources:
+      cpu: 0.5
+      memory: 1GB
     disk:
       name: art-o-mart-backend-disk
-      size: 1GB
+      size: 2GB
+      mountPath: /var/data
     buildFilter:
       paths:
         - backend/**
         - package.json
+        - package-lock.json
+        - "**/*.js"
+        - "**/*.json"

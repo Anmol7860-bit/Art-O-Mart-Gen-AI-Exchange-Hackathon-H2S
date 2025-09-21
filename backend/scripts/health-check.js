@@ -373,8 +373,8 @@ class HealthChecker {
       'NODE_ENV',
       'PORT',
       'SUPABASE_URL',
-      'SUPABASE_ANON_KEY',
-      'GOOGLE_GEMINI_API_KEY'
+      'SUPABASE_SERVICE_KEY',
+      'GEMINI_API_KEY'
     ];
 
     const envStatus = {};
