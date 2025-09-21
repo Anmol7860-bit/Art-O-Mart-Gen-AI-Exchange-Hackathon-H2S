@@ -30,15 +30,17 @@ import dotenv from 'dotenv';
 import chalk from 'chalk';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: ['.env.local', '.env'] });
 
 // Validate environment
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-  console.error(chalk.red('❌ Error: SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables are required'));
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+if (!process.env.SUPABASE_URL || !serviceKey) {
+  console.error(chalk.red('❌ Error: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SERVICE_KEY) environment variables are required'));
+  console.log(chalk.yellow('💡 Make sure you have .env.local with your real service role key'));
   process.exit(1);
 }
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+const supabase = createClient(process.env.SUPABASE_URL, serviceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
@@ -46,7 +48,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 });
 
 /**
- * Expected database schema
+ * Expected database schema - aligned with migration
  */
 const EXPECTED_SCHEMA = {
   tables: [
@@ -55,11 +57,11 @@ const EXPECTED_SCHEMA = {
     'artisan_profiles',
     'products',
     'product_reviews',
+    'carts',
+    'addresses', 
     'orders',
     'order_items',
-    'payments',
-    'wishlists',
-    'cart_items'
+    'wishlists'
   ],
   
   enums: [
@@ -81,11 +83,19 @@ const EXPECTED_SCHEMA = {
   ],
   
   critical_foreign_keys: [
+    { table: 'artisan_profiles', column: 'user_id', references: 'user_profiles' },
     { table: 'products', column: 'artisan_id', references: 'artisan_profiles' },
     { table: 'products', column: 'category_id', references: 'categories' },
-    { table: 'orders', column: 'user_id', references: 'user_profiles' },
+    { table: 'product_reviews', column: 'product_id', references: 'products' },
+    { table: 'product_reviews', column: 'reviewer_id', references: 'user_profiles' },
+    { table: 'carts', column: 'user_id', references: 'user_profiles' },
+    { table: 'carts', column: 'product_id', references: 'products' },
+    { table: 'addresses', column: 'user_id', references: 'user_profiles' },
+    { table: 'orders', column: 'customer_id', references: 'user_profiles' },
     { table: 'order_items', column: 'order_id', references: 'orders' },
-    { table: 'order_items', column: 'product_id', references: 'products' }
+    { table: 'order_items', column: 'product_id', references: 'products' },
+    { table: 'wishlists', column: 'user_id', references: 'user_profiles' },
+    { table: 'wishlists', column: 'product_id', references: 'products' }
   ]
 };
 
@@ -98,15 +108,12 @@ async function validateTables() {
   const issues = [];
   
   try {
-    // Check if all required tables exist
-    const { data: tables, error } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public');
+    // Check if all required tables exist using RPC
+    const { data: tablesData, error } = await supabase.rpc('get_public_tables');
 
     if (error) throw error;
 
-    const existingTables = tables.map(t => t.table_name);
+    const existingTables = tablesData || [];
     const missingTables = EXPECTED_SCHEMA.tables.filter(table => !existingTables.includes(table));
 
     if (missingTables.length > 0) {
@@ -117,11 +124,9 @@ async function validateTables() {
     for (const tableName of EXPECTED_SCHEMA.tables) {
       if (!existingTables.includes(tableName)) continue;
 
-      const { data: columns, error: colError } = await supabase
-        .from('information_schema.columns')
-        .select('column_name, data_type, is_nullable')
-        .eq('table_schema', 'public')
-        .eq('table_name', tableName);
+      const { data: columnsData, error: colError } = await supabase.rpc('get_table_columns', {
+        table_name_param: tableName
+      });
 
       if (colError) {
         issues.push(`Failed to get columns for ${tableName}: ${colError.message}`);
@@ -130,7 +135,7 @@ async function validateTables() {
 
       // Check for required columns based on table
       const requiredColumns = getRequiredColumns(tableName);
-      const existingColumns = columns.map(c => c.column_name);
+      const existingColumns = (columnsData || []).map(c => c.column_name);
       const missingColumns = requiredColumns.filter(col => !existingColumns.includes(col));
 
       if (missingColumns.length > 0) {
@@ -159,14 +164,13 @@ function getRequiredColumns(tableName) {
   const columnMap = {
     user_profiles: ['id', 'email', 'full_name', 'role', 'created_at'],
     categories: ['id', 'name', 'slug', 'created_at'],
-    artisan_profiles: ['id', 'business_name', 'bio', 'location', 'specializations'],
-    products: ['id', 'name', 'description', 'price', 'category_id', 'artisan_id', 'status'],
-    orders: ['id', 'customer_id', 'total', 'status', 'created_at'],
-    order_items: ['id', 'order_id', 'product_id', 'quantity', 'price'],
-    payments: ['id', 'order_id', 'amount', 'status', 'payment_method'],
-    product_reviews: ['id', 'product_id', 'user_id', 'rating', 'comment'],
-    wishlists: ['id', 'user_id', 'product_id', 'created_at'],
-    carts: ['id', 'user_id', 'product_id', 'quantity', 'created_at']
+    artisan_profiles: ['id', 'user_id', 'business_name', 'craft_specialty', 'bio', 'years_of_experience', 'region', 'workshop_address', 'website_url', 'social_media', 'trust_score', 'is_verified', 'verification_date', 'created_at', 'updated_at'],
+    products: ['id', 'title', 'description', 'price', 'category_id', 'artisan_id', 'status'],
+    orders: ['id', 'customer_id', 'total_amount', 'status', 'created_at'],
+    order_items: ['id', 'order_id', 'product_id', 'artisan_id', 'quantity', 'unit_price', 'total_price', 'product_title', 'created_at'],
+    product_reviews: ['id', 'product_id', 'reviewer_id', 'rating', 'review_text', 'created_at'],
+    wishlists: ['id', 'user_id', 'product_id', 'added_at'],
+    carts: ['id', 'user_id', 'product_id', 'quantity', 'added_at']
   };
 
   return columnMap[tableName] || ['id'];
@@ -181,18 +185,11 @@ async function validateForeignKeys() {
   const issues = [];
 
   try {
-    const { data: constraints, error } = await supabase
-      .from('information_schema.table_constraints')
-      .select(`
-        constraint_name,
-        table_name,
-        constraint_type
-      `)
-      .eq('constraint_type', 'FOREIGN KEY')
-      .eq('table_schema', 'public');
+    const { data: constraintsData, error } = await supabase.rpc('get_foreign_keys');
 
     if (error) throw error;
 
+    const constraints = constraintsData || [];
     const existingFKs = constraints.map(c => `${c.table_name}.${c.constraint_name}`);
     
     // Check critical foreign keys exist
@@ -229,15 +226,12 @@ async function validateEnums() {
   const issues = [];
 
   try {
-    // Get custom enum types
-    const { data: types, error } = await supabase
-      .from('pg_type')
-      .select('typname')
-      .eq('typtype', 'e');
+    // Get custom enum types using RPC
+    const { data: enumsData, error } = await supabase.rpc('get_enum_types');
 
     if (error) throw error;
 
-    const existingEnums = types.map(t => t.typname);
+    const existingEnums = enumsData || [];
     const missingEnums = EXPECTED_SCHEMA.enums.filter(enumType => !existingEnums.includes(enumType));
 
     if (missingEnums.length > 0) {
@@ -289,10 +283,7 @@ async function validateRLS() {
 
   try {
     // Check which tables have RLS enabled
-    const { data: tables, error } = await supabase
-      .from('pg_tables')
-      .select('tablename, rowsecurity')
-      .eq('schemaname', 'public');
+    const { data: tables, error } = await supabase.rpc('get_tables_with_rls');
 
     if (error) throw error;
 
@@ -300,7 +291,7 @@ async function validateRLS() {
     const tablesWithoutRLS = tables.filter(t => !t.rowsecurity).map(t => t.tablename);
 
     // Tables that should have RLS enabled
-    const shouldHaveRLS = ['user_profiles', 'orders', 'carts', 'wishlists', 'payments'];
+    const shouldHaveRLS = ['user_profiles', 'orders', 'carts', 'wishlists'];
     const missingRLS = shouldHaveRLS.filter(table => !tablesWithRLS.includes(table));
 
     if (missingRLS.length > 0) {
@@ -336,15 +327,11 @@ async function validateFunctions() {
 
   try {
     // Check for required functions
-    const { data: functions, error } = await supabase
-      .from('information_schema.routines')
-      .select('routine_name')
-      .eq('routine_schema', 'public')
-      .eq('routine_type', 'FUNCTION');
+    const { data: functions, error } = await supabase.rpc('get_public_functions');
 
     if (error) throw error;
 
-    const existingFunctions = functions.map(f => f.routine_name);
+    const existingFunctions = functions || [];
     const missingFunctions = EXPECTED_SCHEMA.functions.filter(func => !existingFunctions.includes(func));
 
     if (missingFunctions.length > 0) {
@@ -360,11 +347,9 @@ async function validateFunctions() {
     }
 
     // Check for triggers
-    const { data: triggers, error: triggerError } = await supabase
-      .from('information_schema.triggers')
-      .select('trigger_name, event_object_table');
+    const { data: triggers, error: triggerError } = await supabase.rpc('get_triggers');
 
-    if (!triggerError && triggers.length > 0) {
+    if (!triggerError && triggers && triggers.length > 0) {
       console.log(chalk.green(`✅ Found ${triggers.length} database triggers`));
     }
 
@@ -467,7 +452,7 @@ async function runValidationTests() {
         const { error } = await supabase
           .from('products')
           .insert({
-            name: 'Test Product',
+            title: 'Test Product',
             description: 'Test',
             price: 100,
             category_id: 'invalid-category-id',

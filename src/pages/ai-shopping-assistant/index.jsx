@@ -11,6 +11,7 @@ import AgentManager from './components/AgentManager';
 import WebSocketProvider, { useWebSocket } from './components/WebSocketManager';
 import TaskProgress from './components/TaskProgress';
 import { useAuth } from '../../contexts/AuthContext';
+import { chatService } from '../../services/chatService';
 
 const AIShoppingAssistantContent = () => {
   const navigate = useNavigate();
@@ -96,8 +97,8 @@ const AIShoppingAssistantContent = () => {
   }, [isConnected, subscribe]);
 
   const handleSendMessage = async (message) => {
-    if (!isConnected || !selectedAgent) {
-      console.error('No agent selected or connection lost');
+    if (!selectedAgent) {
+      console.error('No agent selected');
       return;
     }
 
@@ -112,23 +113,41 @@ const AIShoppingAssistantContent = () => {
     setIsLoading(true);
     setShowWelcome(false);
 
-    // Create new task
-    const taskId = Date.now().toString();
-    setCurrentTask({
-      taskId,
-      agentType: selectedAgent,
-      status: 'starting',
-      progress: 0,
-      message: 'Processing your request...'
-    });
-
-    // Send message to agent using standardized event name and payload
-    emit('chat-message', {
-      message,
-      agent_type: selectedAgent, // Use underscore format for consistency with backend
-      task_id: taskId,
-      preferences: userPreferences
-    });
+    try {
+      // Send message using chat service
+      const response = await chatService.sendMessage(message, selectedAgent);
+      
+      if (response.success) {
+        // Add AI response to conversation
+        setConversationHistory(prev => [...prev, {
+          id: Date.now() + 1,
+          sender: 'ai',
+          text: response.response,
+          timestamp: new Date(),
+          agent: response.agent
+        }]);
+      } else {
+        // Add error message
+        setConversationHistory(prev => [...prev, {
+          id: Date.now() + 1,
+          sender: 'ai',
+          text: 'Sorry, I encountered an error processing your request. Please try again.',
+          timestamp: new Date(),
+          isError: true
+        }]);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setConversationHistory(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'ai',
+        text: 'I apologize, but I\'m having trouble responding right now. Please try again in a moment.',
+        timestamp: new Date(),
+        isError: true
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelTask = () => {

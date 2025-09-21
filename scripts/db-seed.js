@@ -18,8 +18,8 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables with fallback to .env.local
+dotenv.config({ path: ['.env.local', '.env'] });
 
 // Validate environment
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {

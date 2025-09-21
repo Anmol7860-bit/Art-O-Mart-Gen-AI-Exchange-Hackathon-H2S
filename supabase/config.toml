@@ -4,7 +4,7 @@
 # Project Configuration
 # Replace 'your-project-ref' with your actual Supabase project reference
 # Get this from your Supabase Dashboard > Settings > General > Reference ID
-project_id = "your-project-ref"
+project_id = "lqtlksjjfwpbpxmrfzfb"
 
 [api]
 # API server configuration

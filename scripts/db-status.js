@@ -30,25 +30,31 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 /**
- * Check basic database connection
+ * Check database connection
  */
 async function checkConnection() {
-  console.log(chalk.blue('🔍 Checking database connection...'));
+  console.log(chalk.blue('🔍 Testing database connection...'));
   
   try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('count')
-      .limit(1);
+    // Use direct SQL query instead of Supabase client table query
+    const { data, error } = await supabase.rpc('version');
 
     if (error) {
-      throw error;
+      // Fallback to simple table count query
+      const fallback = await supabase
+        .from('user_profiles')
+        .select('id', { count: 'exact', head: true });
+      
+      if (fallback.error) {
+        throw fallback.error;
+      }
     }
 
     console.log(chalk.green('✅ Database connection successful'));
     return true;
   } catch (error) {
     console.log(chalk.red('❌ Database connection failed:'), error.message);
+    console.log(chalk.yellow('💡 Check your SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'));
     return false;
   }
 }
@@ -80,35 +86,69 @@ async function checkHealth() {
 }
 
 /**
- * Validate database schema
+ * Validate database schema - aligned with migration
  */
 async function validateSchema() {
-  console.log(chalk.blue('📋 Validating database schema...'));
+  console.log(chalk.blue('🏗️  Validating database schema...'));
   
+  // Tables that should exist based on migration
   const requiredTables = [
     'user_profiles',
-    'categories',
-    'artisan_profiles', 
+    'categories', 
+    'artisan_profiles',
     'products',
     'product_reviews',
+    'carts',
+    'addresses',
     'orders',
-    'order_items',
-    'payments',
-    'wishlists',
-    'carts'
+    'order_items', 
+    'wishlists'
   ];
 
   try {
-    const { data, error } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public');
+    // Get table list using SQL function that queries information_schema
+    const { data, error } = await supabase.rpc('get_table_list');
 
-    if (error) {
-      throw error;
+    if (error || !data) {
+      // Fallback: check each table individually
+      console.log(chalk.yellow('⚠️  Using individual table checks...'));
+      const existingTables = [];
+      
+      for (const table of requiredTables) {
+        try {
+          const { error: tableError } = await supabase
+            .from(table)
+            .select('*', { count: 'exact', head: true });
+          
+          if (!tableError) {
+            existingTables.push(table);
+          }
+        } catch (e) {
+          // Table doesn't exist or no access
+        }
+      }
+      
+      const missingTables = requiredTables.filter(table => !existingTables.includes(table));
+      
+      if (missingTables.length === 0) {
+        console.log(chalk.green('✅ All required tables exist'));
+        console.log(chalk.gray(`   Found ${existingTables.length} total tables`));
+      } else {
+        console.log(chalk.yellow('⚠️  Some required tables are missing:'));
+        missingTables.forEach(table => {
+          console.log(chalk.red(`   - ${table}`));
+        });
+      }
+
+      return {
+        existingTables,
+        missingTables,
+        isComplete: missingTables.length === 0
+      };
     }
 
-    const existingTables = data.map(table => table.table_name);
+    // If RPC worked, use its result
+    const existingTables = data || requiredTables; // Assume all exist if data is returned
     const missingTables = requiredTables.filter(table => !existingTables.includes(table));
 
     if (missingTables.length === 0) {
@@ -138,13 +178,18 @@ async function validateSchema() {
 async function getTableStats() {
   console.log(chalk.blue('📊 Collecting table statistics...'));
   
+  // Updated table list to match migration
   const tables = [
     'user_profiles',
     'categories',
-    'artisan_profiles',
-    'products', 
+    'artisan_profiles', 
+    'products',
+    'product_reviews',
+    'carts',
+    'addresses',
     'orders',
-    'product_reviews'
+    'order_items',
+    'wishlists'
   ];
 
   const stats = {};

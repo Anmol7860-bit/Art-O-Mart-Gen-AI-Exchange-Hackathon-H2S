@@ -6,6 +6,7 @@ import Input from '../../../components/ui/Input';
 import AgentStatusIndicator from '../../ai-shopping-assistant/components/AgentStatusIndicator';
 import TaskProgress from '../../ai-shopping-assistant/components/TaskProgress';
 import { useWebSocket } from '../../ai-shopping-assistant/components/WebSocketManager';
+import { aiService } from '../../../services/aiService';
 
 const contentTypes = [
   { id: 'social', label: 'Social Media Post', icon: 'share-2' },
@@ -101,45 +102,28 @@ const AIContentGenerator = () => {
   };
 
   const generateContent = async () => {
-    if (!selectedImage || !isConnected) return;
+    if (!selectedImage) return;
 
     setIsGenerating(true);
     setGeneratedContent('');
     
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage.url);
-      formData.append('contentType', contentType);
-      formData.append('prompt', customPrompt);
-      formData.append('culturalContext', JSON.stringify(culturalContext));
-
-      // Start the appropriate agent task based on content type
-      const agentEndpoint = contentType === 'product' || contentType === 'seo'
-        ? '/api/agents/artisanAssistant/task'
-        : '/api/agents/contentGeneration/task';
-
-      const response = await fetch(agentEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: contentType === 'product' || contentType === 'seo' 
-            ? 'generateListingContent' 
-            : 'generateContent',
-          context: {
-            image: selectedImage.url,
-            contentType,
-            prompt: customPrompt,
-            culturalContext,
-          }
-        })
+      const response = await aiService.generateContent({
+        image: selectedImage.url,
+        contentType,
+        prompt: customPrompt,
+        culturalContext,
       });
 
-      if (!response.ok) throw new Error('Failed to generate content');
-      
+      if (response.success) {
+        setGeneratedContent(response.content);
+      } else {
+        throw new Error(response.message || 'Failed to generate content');
+      }
     } catch (error) {
       console.error('Content generation error:', error);
+      setGeneratedContent('Failed to generate content. Please try again.');
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -311,7 +295,7 @@ const AIContentGenerator = () => {
           <Button
             variant="default"
             onClick={generateContent}
-            disabled={!selectedImage || isGenerating || !isConnected}
+            disabled={!selectedImage || isGenerating}
             className="w-full sm:w-auto"
           >
             <AppIcon name="sparkles" size={16} className="mr-2" />
