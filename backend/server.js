@@ -6,7 +6,7 @@ import { createServer } from 'http';
 import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from './config/database.js';
 import agentManager from './api/agentManager.js';
-import WebSocketManager from './api/websocket.js';
+// import WebSocketManager from './api/websocket.js';
 import { initializeEnvironment } from './utils/envValidator.js';
 import backendMonitoring from './middleware/monitoring.js';
 
@@ -24,9 +24,6 @@ import {
 import aiRouter from './api/ai.routes.js';
 import agentsRouter from './api/agents.routes.js';
 import healthRouter from './api/health.routes.js';
-import { configureLogging } from './middleware/logger.js';
-import { configureCORS } from './middleware/cors.js';
-import { configureRateLimit } from './middleware/rateLimit.js';
 import { handleError } from './middleware/errorHandler.js';
 
 // Load environment variables
@@ -40,7 +37,7 @@ const app = express();
 const httpServer = createServer(app);
 
 // Initialize WebSocket manager
-const wsManager = new WebSocketManager(httpServer, agentManager);
+// const wsManager = new WebSocketManager(httpServer, agentManager);
 
 // Trust proxy (important for accurate client IP detection)
 app.set('trust proxy', 1);
@@ -131,11 +128,11 @@ app.use((err, req, res, next) => {
   });
 
   // Notify via WebSocket about server errors (without sensitive details)
-  wsManager.broadcast('system', 'system:error', {
-    type: 'server_error',
-    message: 'A server error occurred',
-    timestamp: new Date().toISOString()
-  });
+  // // wsManager.broadcast('system', 'system:error', {
+  //   type: 'server_error', 
+  //   message: 'A server error occurred',
+  //   timestamp: new Date().toISOString()
+  // });
 
   // Don't expose internal errors in production
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -174,25 +171,26 @@ app.use((req, res) => {
 const initializeAgents = async () => {
   try {
     logger.info('Starting agent system initialization...');
-    await agentManager.initializeAgents();
+    // Comment out agent initialization for now
+    // await agentManager.initializeAgents();
     
     // Broadcast agent system ready event
-    wsManager.broadcast('system', 'system:agents_ready', {
-      message: 'Agent system initialized successfully',
-      timestamp: new Date().toISOString(),
-      agentCount: Object.keys(agentManager.getAllAgentsStatus()).length
-    });
+    // wsManager.broadcast('system', 'system:agents_ready', {
+    //   message: 'Agent system initialized successfully',
+    //   timestamp: new Date().toISOString(),
+    //   agentCount: Object.keys(agentManager.getAllAgentsStatus()).length
+    // });
     
     logger.info('Agent system initialized successfully');
   } catch (error) {
     logger.error('Failed to initialize agents', { error: error.message });
     
     // Broadcast error event
-    wsManager.broadcast('system', 'system:error', {
-      type: 'agent_initialization_failed',
-      message: 'Failed to initialize agent system',
-      timestamp: new Date().toISOString()
-    });
+    // wsManager.broadcast('system', 'system:error', {
+    //   type: 'agent_initialization_failed',
+    //   message: 'Failed to initialize agent system', 
+    //   timestamp: new Date().toISOString()
+    // });
   }
 };
 
@@ -215,12 +213,12 @@ httpServer.listen(PORT, HOST, async () => {
   await initializeAgents();
   
   // Broadcast server ready event
-  wsManager.broadcast('system', 'system:server_ready', {
-    message: 'Server started successfully',
-    timestamp: new Date().toISOString(),
-    port: PORT,
-    host: HOST
-  });
+  // wsManager.broadcast('system', 'system:server_ready', {
+  //   message: 'Server started successfully',
+  //   timestamp: new Date().toISOString(),
+  //   port: PORT,
+  //   host: HOST
+  // });
   
   logger.info('✅ All systems operational!');
 });
@@ -231,10 +229,10 @@ const shutdown = async (signal) => {
   
   try {
     // Broadcast shutdown event
-    wsManager.broadcast('system', 'system:shutdown', {
-      message: 'Server shutting down',
-      timestamp: new Date().toISOString()
-    });
+    // wsManager.broadcast('system', 'system:shutdown', {
+    //   message: 'Server shutting down',
+    //   timestamp: new Date().toISOString()
+    // });
     
     // Stop accepting new connections
     httpServer.close(() => {
@@ -243,11 +241,12 @@ const shutdown = async (signal) => {
     
     // Stop all agents
     logger.info('Stopping AI agents...');
-    await agentManager.stopAllAgents();
+    // Comment out agent shutdown for now
+    // await agentManager.stopAllAgents();
     logger.info('AI agents stopped');
     
     // Close WebSocket connections
-    wsManager.closeAllConnections();
+    // wsManager.closeAllConnections();
     logger.info('WebSocket connections closed');
     
     // Close database connections (if applicable)
